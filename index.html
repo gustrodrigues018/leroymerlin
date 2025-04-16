@@ -1,111 +1,59 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestão de EPIs</title>
+  <title>Painel de EPIs - Leroy Merlin</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-
-    header {
-      background-color: #4CAF50;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-    }
-
-    main {
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: center;
-      align-items: center;
-      height: 80vh;
+      height: 100vh;
+      background: #e6f2e6;
+      font-family: Arial, sans-serif;
     }
 
-    .botao {
-      background-color: #4CAF50;
-      color: white;
-      padding: 20px 40px;
-      font-size: 20px;
-      text-align: center;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 10px;
-      transition: background-color 0.3s ease;
+    h1 {
+      margin-bottom: 40px;
+      color: #2f4f2f;
     }
 
-    .botao:hover {
-      background-color: #45a049;
-    }
-
-    .botao:focus {
-      outline: none;
-    }
-
-    .container {
+    .botoes {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      gap: 30px;
     }
 
-    .tabela-container {
-      margin-top: 20px;
-      width: 80%;
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 12px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
-
-    th {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    td button {
-      background-color: red;
-      color: white;
-      padding: 5px 10px;
+    .botao-painel {
+      background: linear-gradient(145deg, #bde0bd, #d0f0d0);
+      color: #2f4f2f;
       border: none;
+      padding: 30px 50px;
+      font-size: 24px;
+      border-radius: 16px;
+      box-shadow: 4px 4px 8px #a3c2a3;
+      transition: 0.3s;
       cursor: pointer;
     }
 
-    td button:hover {
-      background-color: #d32f2f;
+    .botao-painel:hover {
+      transform: scale(1.05);
+      background: #cceacc;
     }
   </style>
 </head>
 <body>
-  <header>
-    GESTÃO DE EPIS E RETIRADAS
-  </header>
-
-  <main>
-    <div class="container">
-      <button class="botao" onclick="window.location.href='estoque.html'">GERENCIAR ESTOQUE</button>
-      <button class="botao" onclick="window.location.href='retiradas.html'">REGISTRAR RETIRADA</button>
-    </div>
-
- 
-  </main>
-
-  <script src="script.js"></script>
+  <h1>Painel de Controle de EPIs</h1>
+  <div class="botoes">
+    <a href="retiradas.html">
+      <button class="botao-painel">Retiradas de EPI</button>
+    </a>
+    <a href="estoque.html">
+      <button class="botao-painel">Estoque de EPI</button>
+    </a>
+  </div>
 </body>
 </html>
+
 
