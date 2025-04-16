@@ -119,7 +119,7 @@ function deletarRetirada(id) {
   }
 }
 
-// Modificação: renderizarRetiradas com filtro por LDAP
+// === Renderizar retiradas com filtro por LDAP ===
 function renderizarRetiradas(filtroLdap = '') {
   const tbody = document.querySelector('#tabelaRetiradas tbody');
   if (!tbody) return;
@@ -194,4 +194,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
