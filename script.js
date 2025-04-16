@@ -7,13 +7,12 @@ function carregarLocal(key) {
   return JSON.parse(localStorage.getItem(key)) || [];
 }
 
-// Função para resetar apenas as retiradas
+// === Reset ===
 function resetarRetiradas() {
   localStorage.removeItem('retiradas');
   renderizarRetiradas();
 }
 
-// Função para resetar apenas o estoque
 function resetarEstoque() {
   localStorage.removeItem('epis');
   renderizarEpis();
@@ -21,16 +20,27 @@ function resetarEstoque() {
 
 // === EPIs ===
 function adicionarEPI(nome, quantidade, categoria, tamanho) {
+  if (!nome || !quantidade || !categoria) {
+    alert("PREENCHA TODOS OS CAMPOS OBRIGATÓRIOS: NOME, QUANTIDADE E CATEGORIA.");
+    return;
+  }
+
+  const quantidadeInt = parseInt(quantidade);
+  if (isNaN(quantidadeInt) || quantidadeInt <= 0) {
+    alert("QUANTIDADE INVÁLIDA.");
+    return;
+  }
+
   const epis = carregarLocal('epis');
-  const epiExistente = epis.find(e => e.nome === nome && e.tamanho === tamanho);
+  const epiExistente = epis.find(e => e.nome === nome && e.tamanho === (tamanho || '-'));
 
   if (epiExistente) {
-    epiExistente.quantidade += parseInt(quantidade);
+    epiExistente.quantidade += quantidadeInt;
   } else {
     const novo = {
       id: Date.now(),
       nome,
-      quantidade: parseInt(quantidade),
+      quantidade: quantidadeInt,
       categoria,
       tamanho: tamanho || '-',
       data: new Date().toISOString()
@@ -62,7 +72,7 @@ function renderizarEpis() {
         <td>${e.nome}</td>
         <td>${e.quantidade}</td>
         <td>${e.categoria}</td>
-        <td>${e.tamanho || '-'}</td>
+        <td>${e.tamanho}</td>
         <td>${dataFormatada}</td>
         <td><button onclick="deletarEPI(${e.id})">EXCLUIR</button></td>
       </tr>
@@ -72,63 +82,75 @@ function renderizarEpis() {
 
 // === Retiradas ===
 function registrarRetirada(ldap, nome_epi, quantidade, tamanho) {
-  const epis = carregarLocal('epis');
-  const epi = epis.find(e => e.nome === nome_epi && e.tamanho === tamanho);
-
-  if (epi) {
-    if (epi.quantidade >= quantidade) {
-      epi.quantidade -= parseInt(quantidade);
-      const retiradas = carregarLocal('retiradas');
-      const nova = {
-        id: Date.now(),
-        ldap,
-        nome_epi,
-        quantidade: parseInt(quantidade),
-        tamanho: tamanho || '-',
-        data: new Date().toISOString()
-      };
-      retiradas.push(nova);
-      salvarLocal('retiradas', retiradas);
-      salvarLocal('epis', epis);
-      renderizarRetiradas();
-      renderizarEpis();
-    } else {
-      alert("QUANTIDADE INSUFICIENTE EM ESTOQUE PARA ESSA RETIRADA.");
-    }
-  } else {
-    alert("EPI NÃO ENCONTRADO NO ESTOQUE.");
+  if (!ldap || !nome_epi || !quantidade) {
+    alert("PREENCHA TODOS OS CAMPOS OBRIGATÓRIOS.");
+    return;
   }
+
+  const quantidadeInt = parseInt(quantidade);
+  if (isNaN(quantidadeInt) || quantidadeInt <= 0) {
+    alert("QUANTIDADE INVÁLIDA.");
+    return;
+  }
+
+  const epis = carregarLocal('epis');
+  const epi = epis.find(e => e.nome === nome_epi && e.tamanho === (tamanho || '-'));
+
+  if (!epi) {
+    alert("EPI NÃO ENCONTRADO NO ESTOQUE.");
+    return;
+  }
+
+  if (epi.quantidade < quantidadeInt) {
+    alert("QUANTIDADE INSUFICIENTE EM ESTOQUE.");
+    return;
+  }
+
+  epi.quantidade -= quantidadeInt;
+
+  const retiradas = carregarLocal('retiradas');
+  const nova = {
+    id: Date.now(),
+    ldap,
+    nome_epi,
+    quantidade: quantidadeInt,
+    tamanho: tamanho || '-',
+    data: new Date().toISOString()
+  };
+
+  retiradas.push(nova);
+  salvarLocal('retiradas', retiradas);
+  salvarLocal('epis', epis);
+
+  renderizarRetiradas();
+  renderizarEpis();
 }
 
 function deletarRetirada(id) {
   let retiradas = carregarLocal('retiradas');
   const retirada = retiradas.find(r => r.id === id);
 
-  if (retirada) {
-    const epis = carregarLocal('epis');
-    const epi = epis.find(e => e.nome === retirada.nome_epi && e.tamanho === retirada.tamanho);
+  if (!retirada) return;
 
-    if (epi) {
-      epi.quantidade += retirada.quantidade;
-      retiradas = retiradas.filter(r => r.id !== id);
-      salvarLocal('retiradas', retiradas);
-      salvarLocal('epis', epis);
-      renderizarRetiradas();
-      renderizarEpis();
-    }
+  const epis = carregarLocal('epis');
+  const epi = epis.find(e => e.nome === retirada.nome_epi && e.tamanho === retirada.tamanho);
+  if (epi) {
+    epi.quantidade += retirada.quantidade;
+    salvarLocal('epis', epis);
   }
+
+  retiradas = retiradas.filter(r => r.id !== id);
+  salvarLocal('retiradas', retiradas);
+  renderizarRetiradas();
+  renderizarEpis();
 }
 
-// === Renderizar retiradas com filtro por LDAP ===
-function renderizarRetiradas(filtroLdap = '') {
+function renderizarRetiradas() {
   const tbody = document.querySelector('#tabelaRetiradas tbody');
   if (!tbody) return;
   const retiradas = carregarLocal('retiradas');
-  const retiradasFiltradas = retiradas.filter(r =>
-    r.ldap.toLowerCase().includes(filtroLdap.toLowerCase())
-  );
   tbody.innerHTML = '';
-  retiradasFiltradas.forEach(r => {
+  retiradas.forEach(r => {
     const dataFormatada = new Date(r.data).toLocaleString();
     tbody.innerHTML += `
       <tr>
@@ -145,52 +167,48 @@ function renderizarRetiradas(filtroLdap = '') {
 
 // === Eventos ===
 document.addEventListener('DOMContentLoaded', () => {
-  // Formulário de Estoque
+  // Estoque
   const formAdicionar = document.querySelector('#formAdicionar');
   if (formAdicionar) {
     renderizarEpis();
     formAdicionar.addEventListener('submit', (e) => {
       e.preventDefault();
       const form = e.target;
-      adicionarEPI(form.nome.value, form.quantidade.value, form.categoria.value, form.tamanho.value);
+      adicionarEPI(
+        form.nome.value.toUpperCase(),
+        form.quantidade.value,
+        form.categoria.value.toUpperCase(),
+        form.tamanho.value.toUpperCase()
+      );
       form.reset();
     });
   }
 
-  // Formulário de Retiradas
+  // Retiradas
   const formRetirada = document.querySelector('#formRetirada');
   if (formRetirada) {
     renderizarRetiradas();
     formRetirada.addEventListener('submit', (e) => {
       e.preventDefault();
       const form = e.target;
-      registrarRetirada(form.ldap.value, form.nome_epi.value, form.quantidade.value, form.tamanho.value);
+      registrarRetirada(
+        form.ldap.value.toUpperCase(),
+        form.nome_epi.value.toUpperCase(),
+        form.quantidade.value,
+        form.tamanho.value.toUpperCase()
+      );
       form.reset();
     });
   }
 
-  // Botão de resetar retiradas
+  // Botões de reset
   const botaoResetarRetiradas = document.querySelector('#resetarRetiradas');
   if (botaoResetarRetiradas) {
-    botaoResetarRetiradas.addEventListener('click', () => {
-      resetarRetiradas();
-    });
+    botaoResetarRetiradas.addEventListener('click', resetarRetiradas);
   }
 
-  // Botão de resetar estoque
   const botaoResetarEstoque = document.querySelector('#resetarEstoque');
   if (botaoResetarEstoque) {
-    botaoResetarEstoque.addEventListener('click', () => {
-      resetarEstoque();
-    });
-  }
-
-  // Campo de busca por LDAP
-  const campoBusca = document.querySelector('#buscaLdap');
-  if (campoBusca) {
-    campoBusca.addEventListener('input', (e) => {
-      const filtro = e.target.value.trim();
-      renderizarRetiradas(filtro);
-    });
+    botaoResetarEstoque.addEventListener('click', resetarEstoque);
   }
 });
