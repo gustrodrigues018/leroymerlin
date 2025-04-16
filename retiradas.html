@@ -9,29 +9,34 @@
   <h1>Retirada de EPIs</h1>
 
   <form id="formRetirada">
-    <input type="text" name="ldap" placeholder="Matricula do colaborador" required />
+    <input type="text" name="ldap" placeholder="LDAP do funcionário" required />
     <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
-    <input type="number" name="quantidade" placeholder="Quantidade" required />
+    <input type="number" name="quantidade" placeholder="Quantidade a retirar" required />
     <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
     <button type="submit">Registrar Retirada</button>
   </form>
 
-  <h2>Histórico de Retiradas</h2>
-  <table id="tabelaRetiradas">
-   <div class="busca-container">
-  <input type="text" id="buscaLdap" placeholder="Digite sua Matricula">
-</div>
+  <!-- Campo de filtro LDAP -->
+  <input type="text" id="buscaLdap" placeholder="Filtrar por LDAP..." />
+
+  <!-- Botão de resetar retiradas -->
+  <button id="resetarRetiradas">Resetar Retiradas</button>
+
+  <!-- Tabela de retiradas -->
+  <table border="1" id="tabelaRetiradas">
     <thead>
       <tr>
         <th>Data</th>
-        <th>Matricula</th>
-        <th>Nome EPI</th>
-        <th>Qtd</th>
+        <th>LDAP</th>
+        <th>Nome do EPI</th>
+        <th>Quantidade</th>
         <th>Tamanho</th>
-        <th>Ação</th>
+        <th>Ações</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <!-- Populado via JS -->
+    </tbody>
   </table>
 
   <div style="text-align:center; margin: 20px;">
