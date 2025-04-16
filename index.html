@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de EPIs - Leroy Merlin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #e6f2e6;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      margin-bottom: 40px;
+      color: #2f4f2f;
+    }
+
+    .botoes {
+      display: flex;
+      gap: 30px;
+    }
+
+    .botao-painel {
+      background: linear-gradient(145deg, #bde0bd, #d0f0d0);
+      color: #2f4f2f;
+      border: none;
+      padding: 30px 50px;
+      font-size: 24px;
+      border-radius: 16px;
+      box-shadow: 4px 4px 8px #a3c2a3;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .botao-painel:hover {
+      transform: scale(1.05);
+      background: #cceacc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Painel de Controle de EPIs</h1>
+  <div class="botoes">
+    <a href="retiradas.html">
+      <button class="botao-painel">Retiradas de EPI</button>
+    </a>
+    <a href="estoque.html">
+      <button class="botao-painel">Estoque de EPI</button>
+    </a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+/* Paleta: verde-escuro, verde-claro, bege, branco */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background-color: #fdfaf4; /* bege claro */
+    color: #333;
+  }
+  
+  h1, h2 {
+    text-align: center;
+    color: #2e7d32; /* verde-escuro */
+    margin-top: 20px;
+  }
+  
+  form {
+    background-color: #e8f5e9; /* verde-claro */
+    border: 1px solid #c8e6c9;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  input[type="text"],
+  input[type="number"] {
+    width: calc(33% - 12px);
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #a5d6a7;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+  
+  button {
+    background-color: #66bb6a;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #4caf50;
+  }
+  
+  table {
+    width: 90%;
+    margin: 0 auto 30px auto;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    
+  }
+  
+  th {
+    background-color: #a5d6a7; /* verde claro */
+    color: #1b5e20; /* verde mais escuro */
+    padding: 12px;
+    
+  }
+  
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+  }
+  
+  
+  tr:nth-child(even) {
+    background-color: #f1f8e9; /* verde-bege claro */
+  }
+  
+  tr:hover {
+    background-color: #dcedc8; /* hover com tom pastel */
+  }
+  
+  td button {
+    background-color: #e53935;
+    border: none;
+    padding: 6px 10px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  td button:hover {
+    background-color: #c62828;
+  }
+  

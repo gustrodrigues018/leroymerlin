@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Retirada de EPIs</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Retirada de EPIs</h1>
+
+  <form id="formRetirada">
+    <input type="text" name="ldap" placeholder="LDAP do colaborador" required />
+    <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
+    <input type="number" name="quantidade" placeholder="Quantidade" required />
+    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
+    <button type="submit">Registrar Retirada</button>
+  </form>
+
+  <h2>Histórico de Retiradas</h2>
+  <table id="tabelaRetiradas">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>LDAP</th>
+        <th>Nome EPI</th>
+        <th>Qtd</th>
+        <th>Tamanho</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div style="text-align:center; margin: 20px;">
+    <a href="estoque.html"><button>Ir ao Estoque</button></a>
+    <a href="index.html"><button>Voltar ao Início</button></a>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

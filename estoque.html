@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Estoque de EPIs - Leroy Merlin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Estoque de EPIs</h1>
+
+  <form id="formAdicionar">
+    <input type="text" name="nome" placeholder="Nome do EPI" required />
+    <input type="number" name="quantidade" placeholder="Quantidade" required />
+    <input type="text" name="categoria" placeholder="Categoria" required />
+    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
+    <button type="submit">Adicionar EPI</button>
+  </form>
+
+  <h2>Lista de EPIs</h2>
+  <table id="tabelaEpis">
+    <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Quantidade</th>
+          <th>Categoria</th>
+          <th>Tamanho</th>
+          <th>Data</th>
+          <th>Ação</th>
+        </tr>
+      </thead>      
+    <tbody></tbody>
+  </table>
+
+  <div style="text-align:center; margin: 20px;">
+    <a href="retiradas.html"><button>Ir para Retiradas</button></a>
+    <a href="index.html"><button>Voltar ao Início</button></a>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
