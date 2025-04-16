@@ -1,3 +1,12 @@
+.busca-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px auto;
+  text-align: center;
+}
+
 /* Paleta: verde-escuro, verde-claro, bege, branco */
 td, th, p, h1, h2, h3, label, input, button {
   text-transform: uppercase;
