@@ -1,5 +1,10 @@
 /* Paleta: verde-escuro, verde-claro, bege, branco */
+td, th, p, h1, h2, h3, label, input, button {
+  text-transform: uppercase;
+}
+
 body {
+    text-transform: uppercase;
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
     background-color: #fdfaf4; /* bege claro */
