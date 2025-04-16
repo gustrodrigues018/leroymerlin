@@ -1,17 +1,111 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Retirada de EPIs</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de EPIs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+    }
+
+    .botao {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px 40px;
+      font-size: 20px;
+      text-align: center;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .botao:hover {
+      background-color: #45a049;
+    }
+
+    .botao:focus {
+      outline: none;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tabela-container {
+      margin-top: 20px;
+      width: 80%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    td button {
+      background-color: red;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    td button:hover {
+      background-color: #d32f2f;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    GESTÃO DE EPIS E RETIRADAS
+  </header>
 
-  <div style="text-align:center; margin: 20px;">
-    <a href="estoque.html"><button>IR AO ESTOQUE</button></a>
-    <a href="index.html"><button>VOLTAR AO INÍCIO</button></a>
-  </div>
+  <main>
+    <div class="container">
+      <button class="botao" onclick="window.location.href='estoque.html'">GERENCIAR ESTOQUE</button>
+      <button class="botao" onclick="window.location.href='retiradas.html'">REGISTRAR RETIRADA</button>
+    </div>
+
+ 
+  </main>
 
   <script src="script.js"></script>
 </body>
 </html>
+
