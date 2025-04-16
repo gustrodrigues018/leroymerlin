@@ -1,11 +1,12 @@
-.busca-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 20px auto;
-  text-align: center;
-}
+  .centralizado {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .centralizado input {
+    padding: 10px;
+    width: 300px;
+  }
 
 /* Paleta: verde-escuro, verde-claro, bege, branco */
 td, th, p, h1, h2, h3, label, input, button {
