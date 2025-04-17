@@ -4,6 +4,87 @@
   <meta charset="UTF-8" />
   <title>Estoque de EPIs - Leroy Merlin</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Estilos principais para o modal e para os botões */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+    }
+    .modal h2 {
+      margin-bottom: 20px;
+    }
+    .modal label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    .modal input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+    .modal-buttons button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .modal-buttons button:hover {
+      background-color: #0056b3;
+    }
+    .btn-editar {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-editar:hover {
+      background-color: #0056b3;
+    }
+    /* Estilo para a tabela */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
@@ -38,7 +119,6 @@
   <div style="text-align:center; margin: 20px;">
     <a href="retiradas.html"><button>Ir para Retiradas</button></a>
     <a href="index.html"><button>Voltar ao Início</button></a>
-
   </div>
 
   <script src="script.js"></script>
