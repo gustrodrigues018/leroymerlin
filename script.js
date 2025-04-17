@@ -43,6 +43,7 @@ function deletarEPI(id) {
 function editarEPI(id) {
   const epis = carregarLocal('epis');
   const epi = epis.find(e => e.id === id);
+  console.log(epi); // Verifique se os dados do EPI estão sendo encontrados
   if (epi) {
     // Preenche o modal com os dados do EPI
     document.querySelector('#editNome').value = epi.nome;
@@ -51,7 +52,8 @@ function editarEPI(id) {
     document.querySelector('#editTamanho').value = epi.tamanho;
 
     // Exibe o modal
-    document.querySelector('.modal-overlay').style.display = 'flex';
+    const modalOverlay = document.querySelector('.modal-overlay');
+    modalOverlay.style.display = 'flex';  // Garante que o modal será exibido
 
     // Ao salvar, atualiza os dados
     document.querySelector('#saveEdit').onclick = () => {
@@ -70,11 +72,14 @@ function editarEPI(id) {
         fecharModal();
       }
     };
+  } else {
+    console.log('EPI não encontrado!');
   }
 }
 
+// Função para fechar o modal
 function fecharModal() {
-  document.querySelector('.modal-overlay').style.display = 'none';
+  document.querySelector('.modal-overlay').style.display = 'none'; // Oculta o modal
 }
 
 function renderizarEpis() {
@@ -257,4 +262,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
