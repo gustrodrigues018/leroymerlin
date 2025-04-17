@@ -4,67 +4,7 @@
   <meta charset="UTF-8" />
   <title>Estoque de EPIs - Leroy Merlin</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 400px;
-      width: 100%;
-    }
-    .modal h2 {
-      margin-bottom: 20px;
-    }
-    .modal label {
-      display: block;
-      margin: 10px 0 5px;
-    }
-    .modal input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .modal-buttons {
-      display: flex;
-      justify-content: space-between;
-    }
-    .modal-buttons button {
-      padding: 10px 20px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .modal-buttons button:hover {
-      background-color: #0056b3;
-    }
-    .btn-editar {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-editar:hover {
-      background-color: #0056b3;
-    }
-  </style>
+
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
@@ -94,25 +34,6 @@
     </tbody>
   </table>
 
-  <!-- Modal de Edição -->
-  <div class="modal-overlay">
-    <div class="modal">
-      <h2>Editar EPI</h2>
-      <label for="editNome">Nome:</label>
-      <input type="text" id="editNome" />
-      <label for="editQuantidade">Quantidade:</label>
-      <input type="number" id="editQuantidade" />
-      <label for="editCategoria">Categoria:</label>
-      <input type="text" id="editCategoria" />
-      <label for="editTamanho">Tamanho:</label>
-      <input type="text" id="editTamanho" />
-      <div class="modal-buttons">
-        <button id="saveEdit">Salvar</button>
-        <button onclick="fecharModal()">Fechar</button>
-      </div>
-    </div>
-  </div>
-
   <hr />
 
   <div style="text-align:center; margin: 20px;">
@@ -120,110 +41,6 @@
     <a href="index.html"><button>Voltar ao Início</button></a>
   </div>
 
-  <script>// Função para carregar os EPIs da memória local (localStorage)
-function carregarEpis() {
-  const epis = JSON.parse(localStorage.getItem('epis')) || [];
-  const tabela = document.getElementById('tabelaEpis').getElementsByTagName('tbody')[0];
-  tabela.innerHTML = ''; // Limpa a tabela
-
-  epis.forEach((epi, index) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${epi.id}</td>
-      <td>${epi.nome}</td>
-      <td>${epi.quantidade}</td>
-      <td>${epi.categoria}</td>
-      <td>${epi.tamanho || 'N/A'}</td>
-      <td>${epi.data}</td>
-      <td>
-        <button class="btn-editar" onclick="abrirModal(${index})">Editar</button>
-      </td>
-    `;
-    tabela.appendChild(tr);
-  });
-}
-
-// Função para adicionar um novo EPI
-function adicionarEpi(event) {
-  event.preventDefault();
-
-  const nome = event.target.nome.value;
-  const quantidade = event.target.quantidade.value;
-  const categoria = event.target.categoria.value;
-  const tamanho = event.target.tamanho.value;
-
-  if (!nome || !quantidade || !categoria) {
-    alert('Por favor, preencha os campos obrigatórios.');
-    return;
-  }
-
-  const epi = {
-    id: Date.now(), // Usando o timestamp como ID único
-    nome,
-    quantidade,
-    categoria,
-    tamanho,
-    data: new Date().toLocaleDateString(),
-  };
-
-  const epis = JSON.parse(localStorage.getItem('epis')) || [];
-  epis.push(epi);
-  localStorage.setItem('epis', JSON.stringify(epis));
-
-  event.target.reset(); // Limpa o formulário
-  carregarEpis(); // Atualiza a tabela
-}
-
-// Função para abrir o modal de edição
-function abrirModal(index) {
-  const epis = JSON.parse(localStorage.getItem('epis'));
-  const epi = epis[index];
-
-  document.getElementById('editNome').value = epi.nome;
-  document.getElementById('editQuantidade').value = epi.quantidade;
-  document.getElementById('editCategoria').value = epi.categoria;
-  document.getElementById('editTamanho').value = epi.tamanho || '';
-
-  const modalOverlay = document.querySelector('.modal-overlay');
-  modalOverlay.style.display = 'flex';
-
-  // Salvar as alterações ao clicar no botão "Salvar"
-  document.getElementById('saveEdit').onclick = function () {
-    const nome = document.getElementById('editNome').value;
-    const quantidade = document.getElementById('editQuantidade').value;
-    const categoria = document.getElementById('editCategoria').value;
-    const tamanho = document.getElementById('editTamanho').value;
-
-    if (!nome || !quantidade || !categoria) {
-      alert('Por favor, preencha os campos obrigatórios.');
-      return;
-    }
-
-    epi.nome = nome;
-    epi.quantidade = quantidade;
-    epi.categoria = categoria;
-    epi.tamanho = tamanho;
-
-    epis[index] = epi;
-    localStorage.setItem('epis', JSON.stringify(epis));
-
-    fecharModal(); // Fecha o modal
-    carregarEpis(); // Atualiza a tabela
-  };
-}
-
-// Função para fechar o modal
-function fecharModal() {
-  document.querySelector('.modal-overlay').style.display = 'none';
-}
-
-// Inicializa a página carregando os EPIs da memória local
-document.addEventListener('DOMContentLoaded', () => {
-  carregarEpis(); // Carrega os EPIs ao iniciar a página
-
-  const formAdicionar = document.getElementById('formAdicionar');
-  formAdicionar.addEventListener('submit', adicionarEpi); // Adiciona o evento de submit para adicionar EPI
-});
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
