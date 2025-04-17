@@ -1,37 +1,60 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Editar Retirada</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    form {
+      max-width: 400px;
+      margin: auto;
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      font-size: 1em;
+    }
+
+    .btn-azul {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-azul:hover {
+      background-color: #1976D2;
+    }
+
+    .btn-voltar {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-
   <h1>Editar Retirada</h1>
 
-  <div class="form-container">
-    <form id="formEditarRetirada" onsubmit="salvarEdicaoRetirada(event)">
-      <input type="hidden" id="idRetirada" name="idRetirada">
+  <form id="formEditar">
+    <input type="text" name="ldap" placeholder="Matricula" required />
+    <input type="text" name="nome_colaborador" placeholder="Nome do funcionário" required />
+    <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
+    <input type="number" name="quantidade" placeholder="Quantidade" required />
+    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
+    <button type="submit" class="btn-azul">Salvar Alterações</button>
+  </form>
 
-      <label for="ldap">Matrícula:</label>
-      <input type="text" id="ldap" name="ldap" required>
-
-      <label for="nome_colaborador">Nome do Funcionário:</label>
-      <input type="text" id="nome_colaborador" name="nome_colaborador" required>
-
-      <label for="nome_epi">Nome do EPI:</label>
-      <input type="text" id="nome_epi" name="nome_epi" required>
-
-      <label for="quantidade">Quantidade:</label>
-      <input type="number" id="quantidade" name="quantidade" required>
-
-      <label for="tamanho">Tamanho:</label>
-      <input type="text" id="tamanho" name="tamanho">
-
-      <button type="submit">Salvar Alterações</button>
-      <button type="button" onclick="cancelarEdicao()">Cancelar</button>
-    </form>
+  <div class="btn-voltar">
+    <a href="retirada.html"><button class="btn-azul">Voltar</button></a>
   </div>
 
   <script>
@@ -43,117 +66,45 @@
       localStorage.setItem(chave, JSON.stringify(valor));
     }
 
-    function carregarRetiradaParaEdicao(id) {
-      const retiradas = carregarLocal('retiradas');
-      const retirada = retiradas.find(r => r.id === id);
-
-      if (retirada) {
-        document.querySelector('#idRetirada').value = retirada.id;
-        document.querySelector('#ldap').value = retirada.ldap;
-        document.querySelector('#nome_colaborador').value = retirada.nome_colaborador;
-        document.querySelector('#nome_epi').value = retirada.nome_epi;
-        document.querySelector('#quantidade').value = retirada.quantidade;
-        document.querySelector('#tamanho').value = retirada.tamanho || '';
-      } else {
-        alert('Retirada não encontrada.');
-        window.location.href = 'retiradas.html';
-      }
-    }
-
-    function salvarEdicaoRetirada(event) {
-      event.preventDefault();
-
-      const id = parseInt(document.querySelector('#idRetirada').value);
-      const ldap = document.querySelector('#ldap').value;
-      const nome_colaborador = document.querySelector('#nome_colaborador').value;
-      const nome_epi = document.querySelector('#nome_epi').value;
-      const quantidade = parseInt(document.querySelector('#quantidade').value);
-      const tamanho = document.querySelector('#tamanho').value;
-
-      let retiradas = carregarLocal('retiradas');
-      const index = retiradas.findIndex(r => r.id === id);
-
-      if (index !== -1) {
-        retiradas[index] = {
-          ...retiradas[index],
-          ldap,
-          nome_colaborador,
-          nome_epi,
-          quantidade,
-          tamanho
-        };
-
-        salvarLocal('retiradas', retiradas);
-        alert('Retirada atualizada com sucesso!');
-        window.location.href = 'retiradas.html';
-      } else {
-        alert('Erro ao atualizar a retirada.');
-      }
-    }
-
-    function cancelarEdicao() {
-      window.location.href = 'retiradas.html';
+    function obterIdDaURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      const id = parseInt(params.get('id'));
+      const form = document.querySelector('#formEditar');
+      const id = obterIdDaURL();
+      const retiradas = carregarLocal('retiradas');
+      const retirada = retiradas.find(r => r.id === id);
 
-      if (id) {
-        carregarRetiradaParaEdicao(id);
-      } else {
-        alert('ID da retirada não fornecido.');
-        window.location.href = 'retiradas.html';
+      if (!retirada) {
+        alert('Retirada não encontrada.');
+        window.location.href = 'retirada.html';
+        return;
       }
+
+      // Preenche os campos com os dados
+      form.ldap.value = retirada.ldap;
+      form.nome_colaborador.value = retirada.nome_colaborador;
+      form.nome_epi.value = retirada.nome_epi;
+      form.quantidade.value = retirada.quantidade;
+      form.tamanho.value = retirada.tamanho;
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        retirada.ldap = form.ldap.value;
+        retirada.nome_colaborador = form.nome_colaborador.value;
+        retirada.nome_epi = form.nome_epi.value;
+        retirada.quantidade = parseInt(form.quantidade.value);
+        retirada.tamanho = form.tamanho.value;
+
+        salvarLocal('retiradas', retiradas);
+        alert('Retirada atualizada com sucesso!');
+        window.location.href = 'retirada.html';
+      });
     });
   </script>
-
-  <style>
-    .form-container {
-      margin-top: 10px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 50px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 700px;
-      text-align: center;
-    }
-
-    .form-container input,
-    .form-container button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-
-    .form-container button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      transition: background-color 0.3s;
-    }
-
-    .form-container button:hover {
-      background-color: #45a049;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-  </style>
 </body>
 </html>
+
