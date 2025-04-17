@@ -40,49 +40,41 @@ function deletarEPI(id) {
   renderizarEpis();
 }
 
-// === Modal de Edição ===
-function abrirModalEdicao(epi) {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <h2>Editar EPI</h2>
-      <label>Nome: <input type="text" id="edit-nome" value="${epi.nome}" /></label>
-      <label>Quantidade: <input type="number" id="edit-quantidade" value="${epi.quantidade}" /></label>
-      <label>Categoria: <input type="text" id="edit-categoria" value="${epi.categoria}" /></label>
-      <label>Tamanho: <input type="text" id="edit-tamanho" value="${epi.tamanho}" /></label>
-      <div class="modal-buttons">
-        <button id="salvarEdicao">Salvar</button>
-        <button id="cancelarEdicao">Cancelar</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  document.getElementById('salvarEdicao').onclick = () => {
-    epi.nome = document.getElementById('edit-nome').value;
-    epi.quantidade = parseInt(document.getElementById('edit-quantidade').value);
-    epi.categoria = document.getElementById('edit-categoria').value;
-    epi.tamanho = document.getElementById('edit-tamanho').value;
-    const epis = carregarLocal('epis');
-    const index = epis.findIndex(e => e.id === epi.id);
-    if (index !== -1) {
-      epis[index] = epi;
-      salvarLocal('epis', epis);
-      renderizarEpis();
-    }
-    modal.remove();
-  };
-
-  document.getElementById('cancelarEdicao').onclick = () => {
-    modal.remove();
-  };
-}
-
 function editarEPI(id) {
   const epis = carregarLocal('epis');
   const epi = epis.find(e => e.id === id);
-  if (epi) abrirModalEdicao(epi);
+  if (epi) {
+    // Preenche o modal com os dados do EPI
+    document.querySelector('#editNome').value = epi.nome;
+    document.querySelector('#editQuantidade').value = epi.quantidade;
+    document.querySelector('#editCategoria').value = epi.categoria;
+    document.querySelector('#editTamanho').value = epi.tamanho;
+
+    // Exibe o modal
+    document.querySelector('.modal-overlay').style.display = 'flex';
+
+    // Ao salvar, atualiza os dados
+    document.querySelector('#saveEdit').onclick = () => {
+      const novoNome = document.querySelector('#editNome').value;
+      const novaQtd = document.querySelector('#editQuantidade').value;
+      const novaCat = document.querySelector('#editCategoria').value;
+      const novoTam = document.querySelector('#editTamanho').value;
+
+      if (novoNome && novaQtd) {
+        epi.nome = novoNome;
+        epi.quantidade = parseInt(novaQtd);
+        epi.categoria = novaCat;
+        epi.tamanho = novoTam;
+        salvarLocal('epis', epis);
+        renderizarEpis();
+        fecharModal();
+      }
+    };
+  }
+}
+
+function fecharModal() {
+  document.querySelector('.modal-overlay').style.display = 'none';
 }
 
 function renderizarEpis() {
@@ -109,7 +101,7 @@ function renderizarEpis() {
   });
 }
 
-// === Retiradas === (sem alterações)
+// === Retiradas ===
 function registrarRetirada(ldap, nome_colaborador, nome_epi, quantidade, tamanho) {
   const epis = carregarLocal('epis');
   const epi = epis.find(e => e.nome === nome_epi && e.tamanho === tamanho);
@@ -183,6 +175,7 @@ function editarRetirada(id) {
   }
 }
 
+// === Renderizar retiradas com filtro por LDAP ===
 function renderizarRetiradas(filtroLdap = '') {
   const tbody = document.querySelector('#tabelaRetiradas tbody');
   if (!tbody) return;
@@ -212,6 +205,7 @@ function renderizarRetiradas(filtroLdap = '') {
 
 // === Eventos ===
 document.addEventListener('DOMContentLoaded', () => {
+  // Formulário de Estoque
   const formAdicionar = document.querySelector('#formAdicionar');
   if (formAdicionar) {
     renderizarEpis();
@@ -223,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Formulário de Retiradas
   const formRetirada = document.querySelector('#formRetirada');
   if (formRetirada) {
     renderizarRetiradas();
@@ -240,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Botões de reset
   const botaoResetarRetiradas = document.querySelector('#resetarRetiradas');
   if (botaoResetarRetiradas) {
     botaoResetarRetiradas.addEventListener('click', () => {
@@ -254,11 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const campoBusca = document.querySelector('#buscaLdap');
-  if (campoBusca) {
-    campoBusca.addEventListener('input', (e) => {
-      const filtro = e.target.value.trim();
-      renderizarRetiradas(filtro);
-    });
-  }
+  // Fechar modal se clicar fora dele
+  document.querySelector('.modal-overlay').addEventListener('click', (e) => {
+    if (e.target === document.querySelector('.modal-overlay')) {
+      fecharModal();
+    }
+  });
 });
+
