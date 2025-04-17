@@ -3,43 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <title>Painel de EPIs - Leroy Merlin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <style>
+    :root {
+      --verde-escuro: #2e7d32;
+      --verde-claro: #a5d6a7;
+      --verde-pastel: #e8f5e9;
+      --bege-claro: #fdfaf4;
+      --branco: #fff;
+      --sombra: rgba(0, 0, 0, 0.1);
+    }
+
     body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bege-claro);
+      color: var(--verde-escuro);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background: #e6f2e6;
-      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(120deg, var(--verde-pastel), var(--branco));
     }
 
     h1 {
+      font-size: 3rem;
       margin-bottom: 40px;
-      color: #2f4f2f;
+      text-shadow: 1px 1px 2px var(--sombra);
     }
 
     .botoes {
       display: flex;
-      gap: 30px;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .botao-painel {
-      background: linear-gradient(145deg, #bde0bd, #d0f0d0);
-      color: #2f4f2f;
+      background: linear-gradient(135deg, var(--verde-claro), var(--branco));
+      color: var(--verde-escuro);
       border: none;
-      padding: 30px 50px;
-      font-size: 24px;
-      border-radius: 16px;
-      box-shadow: 4px 4px 8px #a3c2a3;
-      transition: 0.3s;
+      padding: 20px 40px;
+      font-size: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px var(--sombra);
+      transition: transform 0.3s ease, background-color 0.3s ease;
       cursor: pointer;
+      min-width: 250px;
+      text-transform: uppercase;
+      font-weight: bold;
     }
 
     .botao-painel:hover {
       transform: scale(1.05);
-      background: #cceacc;
+      background-color: #c5e1a5;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .botao-painel {
+        padding: 16px 24px;
+        font-size: 18px;
+      }
     }
   </style>
 </head>
@@ -53,7 +92,7 @@
       <button class="botao-painel">Estoque de EPI</button>
     </a>
   </div>
+  <footer>&copy; 2025 Leroy Merlin - Gestão de EPIs</footer>
 </body>
 </html>
-
 
