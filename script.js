@@ -40,24 +40,49 @@ function deletarEPI(id) {
   renderizarEpis();
 }
 
-function editarEPI(id) {
-  const epis = carregarLocal('epis');
-  const epi = epis.find(e => e.id === id);
-  if (epi) {
-    const novoNome = prompt("Novo nome:", epi.nome);
-    const novaQtd = prompt("Nova quantidade:", epi.quantidade);
-    const novaCat = prompt("Nova categoria:", epi.categoria);
-    const novoTam = prompt("Novo tamanho:", epi.tamanho);
+// === Modal de Edição ===
+function abrirModalEdicao(epi) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal">
+      <h2>Editar EPI</h2>
+      <label>Nome: <input type="text" id="edit-nome" value="${epi.nome}" /></label>
+      <label>Quantidade: <input type="number" id="edit-quantidade" value="${epi.quantidade}" /></label>
+      <label>Categoria: <input type="text" id="edit-categoria" value="${epi.categoria}" /></label>
+      <label>Tamanho: <input type="text" id="edit-tamanho" value="${epi.tamanho}" /></label>
+      <div class="modal-buttons">
+        <button id="salvarEdicao">Salvar</button>
+        <button id="cancelarEdicao">Cancelar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
 
-    if (novoNome && novaQtd) {
-      epi.nome = novoNome;
-      epi.quantidade = parseInt(novaQtd);
-      epi.categoria = novaCat;
-      epi.tamanho = novoTam;
+  document.getElementById('salvarEdicao').onclick = () => {
+    epi.nome = document.getElementById('edit-nome').value;
+    epi.quantidade = parseInt(document.getElementById('edit-quantidade').value);
+    epi.categoria = document.getElementById('edit-categoria').value;
+    epi.tamanho = document.getElementById('edit-tamanho').value;
+    const epis = carregarLocal('epis');
+    const index = epis.findIndex(e => e.id === epi.id);
+    if (index !== -1) {
+      epis[index] = epi;
       salvarLocal('epis', epis);
       renderizarEpis();
     }
-  }
+    modal.remove();
+  };
+
+  document.getElementById('cancelarEdicao').onclick = () => {
+    modal.remove();
+  };
+}
+
+function editarEPI(id) {
+  const epis = carregarLocal('epis');
+  const epi = epis.find(e => e.id === id);
+  if (epi) abrirModalEdicao(epi);
 }
 
 function renderizarEpis() {
@@ -76,7 +101,7 @@ function renderizarEpis() {
         <td>${e.tamanho || '-'}</td>
         <td>${dataFormatada}</td>
         <td>
-          <button onclick="editarEPI(${e.id})">EDITAR</button>
+          <button class="btn-editar" onclick="editarEPI(${e.id})">EDITAR</button>
           <button onclick="deletarEPI(${e.id})">EXCLUIR</button>
         </td>
       </tr>
@@ -84,7 +109,7 @@ function renderizarEpis() {
   });
 }
 
-// === Retiradas ===
+// === Retiradas === (sem alterações)
 function registrarRetirada(ldap, nome_colaborador, nome_epi, quantidade, tamanho) {
   const epis = carregarLocal('epis');
   const epi = epis.find(e => e.nome === nome_epi && e.tamanho === tamanho);
@@ -158,7 +183,6 @@ function editarRetirada(id) {
   }
 }
 
-// === Renderizar retiradas com filtro por LDAP ===
 function renderizarRetiradas(filtroLdap = '') {
   const tbody = document.querySelector('#tabelaRetiradas tbody');
   if (!tbody) return;
@@ -188,7 +212,6 @@ function renderizarRetiradas(filtroLdap = '') {
 
 // === Eventos ===
 document.addEventListener('DOMContentLoaded', () => {
-  // Formulário de Estoque
   const formAdicionar = document.querySelector('#formAdicionar');
   if (formAdicionar) {
     renderizarEpis();
@@ -200,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Formulário de Retiradas
   const formRetirada = document.querySelector('#formRetirada');
   if (formRetirada) {
     renderizarRetiradas();
@@ -218,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botões de reset
   const botaoResetarRetiradas = document.querySelector('#resetarRetiradas');
   if (botaoResetarRetiradas) {
     botaoResetarRetiradas.addEventListener('click', () => {
@@ -233,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Campo de busca por LDAP
   const campoBusca = document.querySelector('#buscaLdap');
   if (campoBusca) {
     campoBusca.addEventListener('input', (e) => {
