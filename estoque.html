@@ -4,6 +4,51 @@
   <meta charset="UTF-8" />
   <title>Estoque de EPIs - Leroy Merlin</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .btn-editar {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-editar:hover {
+      background-color: #0056b3;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 16px;
+      border-radius: 8px;
+      width: 300px;
+    }
+
+    .modal input {
+      width: 100%;
+      margin: 6px 0;
+      padding: 6px;
+    }
+
+    .modal button {
+      margin-top: 10px;
+      padding: 6px 12px;
+    }
+  </style>
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
@@ -38,9 +83,49 @@
   <div style="text-align:center; margin: 20px;">
     <a href="retiradas.html"><button>Ir para Retiradas</button></a>
     <a href="index.html"><button>Voltar ao Início</button></a>
+  </div>
 
+  <!-- Modal de edição -->
+  <div id="modalEdicao" class="modal">
+    <div class="modal-content">
+      <h3>Editar EPI</h3>
+      <form id="formEditarEpi">
+        <input type="hidden" name="id" />
+        <input type="text" name="nome" placeholder="Nome" required />
+        <input type="number" name="quantidade" placeholder="Quantidade" required />
+        <input type="text" name="categoria" placeholder="Categoria" />
+        <input type="text" name="tamanho" placeholder="Tamanho" />
+        <button type="submit">Salvar</button>
+        <button type="button" onclick="fecharModal()">Cancelar</button>
+      </form>
+    </div>
   </div>
 
   <script src="script.js"></script>
+  <script>
+    function fecharModal() {
+      document.querySelector('#modalEdicao').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const formEditarEpi = document.querySelector('#formEditarEpi');
+      formEditarEpi.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const id = parseInt(formEditarEpi.id.value);
+        const epis = JSON.parse(localStorage.getItem('epis')) || [];
+        const epi = epis.find(e => e.id === id);
+
+        if (epi) {
+          epi.nome = formEditarEpi.nome.value;
+          epi.quantidade = parseInt(formEditarEpi.quantidade.value);
+          epi.categoria = formEditarEpi.categoria.value;
+          epi.tamanho = formEditarEpi.tamanho.value;
+          localStorage.setItem('epis', JSON.stringify(epis));
+          fecharModal();
+          if (typeof renderizarEpis === 'function') renderizarEpis();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
