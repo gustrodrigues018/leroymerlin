@@ -20,22 +20,15 @@ function resetarEstoque() {
 // === EPIs ===
 function adicionarEPI(nome, quantidade, categoria, tamanho) {
   const epis = carregarLocal('epis');
-  const epiExistente = epis.find(e => e.nome === nome && e.tamanho === tamanho);
-
-  if (epiExistente) {
-    epiExistente.quantidade += parseInt(quantidade);
-  } else {
-    const novo = {
-      id: Date.now(),
-      nome,
-      quantidade: parseInt(quantidade),
-      categoria,
-      tamanho: tamanho || '-',
-      data: new Date().toISOString()
-    };
-    epis.push(novo);
-  }
-
+  const novo = {
+    id: Date.now(),
+    nome,
+    quantidade: parseInt(quantidade),
+    categoria,
+    tamanho: tamanho || '-',
+    data: new Date().toISOString()
+  };
+  epis.push(novo);
   salvarLocal('epis', epis);
   renderizarEpis();
 }
@@ -45,6 +38,26 @@ function deletarEPI(id) {
   epis = epis.filter(e => e.id !== id);
   salvarLocal('epis', epis);
   renderizarEpis();
+}
+
+function editarEPI(id) {
+  const epis = carregarLocal('epis');
+  const epi = epis.find(e => e.id === id);
+  if (epi) {
+    const novoNome = prompt("Novo nome:", epi.nome);
+    const novaQtd = prompt("Nova quantidade:", epi.quantidade);
+    const novaCat = prompt("Nova categoria:", epi.categoria);
+    const novoTam = prompt("Novo tamanho:", epi.tamanho);
+
+    if (novoNome && novaQtd) {
+      epi.nome = novoNome;
+      epi.quantidade = parseInt(novaQtd);
+      epi.categoria = novaCat;
+      epi.tamanho = novoTam;
+      salvarLocal('epis', epis);
+      renderizarEpis();
+    }
+  }
 }
 
 function renderizarEpis() {
@@ -62,7 +75,10 @@ function renderizarEpis() {
         <td>${e.categoria}</td>
         <td>${e.tamanho || '-'}</td>
         <td>${dataFormatada}</td>
-        <td><button onclick="deletarEPI(${e.id})">EXCLUIR</button></td>
+        <td>
+          <button onclick="editarEPI(${e.id})">EDITAR</button>
+          <button onclick="deletarEPI(${e.id})">EXCLUIR</button>
+        </td>
       </tr>
     `;
   });
@@ -109,11 +125,35 @@ function deletarRetirada(id) {
 
     if (epi) {
       epi.quantidade += retirada.quantidade;
-      retiradas = retiradas.filter(r => r.id !== id);
+    }
+
+    retiradas = retiradas.filter(r => r.id !== id);
+    salvarLocal('retiradas', retiradas);
+    salvarLocal('epis', epis);
+    renderizarRetiradas();
+    renderizarEpis();
+  }
+}
+
+function editarRetirada(id) {
+  const retiradas = carregarLocal('retiradas');
+  const retirada = retiradas.find(r => r.id === id);
+
+  if (retirada) {
+    const novoLdap = prompt("Nova matrícula:", retirada.ldap);
+    const novoNome = prompt("Novo nome do colaborador:", retirada.nome_colaborador);
+    const novoEpi = prompt("Novo nome do EPI:", retirada.nome_epi);
+    const novaQtd = parseInt(prompt("Nova quantidade:", retirada.quantidade));
+    const novoTam = prompt("Novo tamanho:", retirada.tamanho);
+
+    if (novoLdap && novoNome && novoEpi && novaQtd) {
+      retirada.ldap = novoLdap;
+      retirada.nome_colaborador = novoNome;
+      retirada.nome_epi = novoEpi;
+      retirada.quantidade = novaQtd;
+      retirada.tamanho = novoTam;
       salvarLocal('retiradas', retiradas);
-      salvarLocal('epis', epis);
       renderizarRetiradas();
-      renderizarEpis();
     }
   }
 }
@@ -137,7 +177,10 @@ function renderizarRetiradas(filtroLdap = '') {
         <td>${r.nome_epi}</td>
         <td>${r.quantidade}</td>
         <td>${r.tamanho}</td>
-        <td><button onclick="deletarRetirada(${r.id})">EXCLUIR</button></td>
+        <td>
+          <button onclick="editarRetirada(${r.id})">EDITAR</button>
+          <button onclick="deletarRetirada(${r.id})">EXCLUIR</button>
+        </td>
       </tr>
     `;
   });
