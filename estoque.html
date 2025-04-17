@@ -5,7 +5,6 @@
   <title>Estoque de EPIs - Leroy Merlin</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Estilos principais para o modal e para os botões */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -13,7 +12,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -65,25 +64,6 @@
     .btn-editar:hover {
       background-color: #0056b3;
     }
-    /* Estilo para a tabela */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      opacity: 0.8;
-    }
   </style>
 </head>
 <body>
@@ -113,6 +93,25 @@
       <!-- Populado via JS -->
     </tbody>
   </table>
+
+  <!-- Modal de Edição -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <h2>Editar EPI</h2>
+      <label for="editNome">Nome:</label>
+      <input type="text" id="editNome" />
+      <label for="editQuantidade">Quantidade:</label>
+      <input type="number" id="editQuantidade" />
+      <label for="editCategoria">Categoria:</label>
+      <input type="text" id="editCategoria" />
+      <label for="editTamanho">Tamanho:</label>
+      <input type="text" id="editTamanho" />
+      <div class="modal-buttons">
+        <button id="saveEdit">Salvar</button>
+        <button onclick="fecharModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
 
   <hr />
 
