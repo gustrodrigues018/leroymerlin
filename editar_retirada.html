@@ -45,7 +45,7 @@
 
     function carregarRetiradaParaEdicao(id) {
       const retiradas = carregarLocal('retiradas');
-      const retirada = retiradas.find(r => r.id === id);
+      const retirada = retiradas.find(r => r.id == id);
 
       if (retirada) {
         document.querySelector('#idRetirada').value = retirada.id;
@@ -72,7 +72,7 @@
       const tamanho = form.tamanho.value;
 
       const retiradas = carregarLocal('retiradas');
-      const index = retiradas.findIndex(r => r.id === id);
+      const index = retiradas.findIndex(r => r.id == id);
 
       if (index !== -1) {
         retiradas[index] = {
@@ -97,9 +97,10 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+      const id = urlParams.get('id'); // Captura o ID da URL
+
       if (id) {
-        carregarRetiradaParaEdicao(id);
+        carregarRetiradaParaEdicao(id); // Carrega a retirada com o ID fornecido
       } else {
         alert('ID da retirada não fornecido.');
         window.location.href = 'index.html';
