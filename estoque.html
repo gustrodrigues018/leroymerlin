@@ -69,105 +69,89 @@
 
   </div>
 
-  <script>
-function excluirQuatroPrimeirosEPIs() {
-  let epis = carregarLocal('epis');
-  epis = epis.slice(4); // Remove os 4 primeiros
-  salvarLocal('epis', epis);
-  renderizarEstoque();
-}
-document.addEventListener('DOMContentLoaded', () => {
-  excluirQuatroPrimeirosEPIs(); // CHAMADA AQUI
-  renderizarEstoque();
-  ...
-});
+<script>
+  function carregarLocal(chave) {
+    return JSON.parse(localStorage.getItem(chave)) || [];
   }
-    
 
-    function carregarLocal(chave) {
-      return JSON.parse(localStorage.getItem(chave)) || [];
-    }
+  function salvarLocal(chave, valor) {
+    localStorage.setItem(chave, JSON.stringify(valor));
+  }
 
-    function salvarLocal(chave, valor) {
-      localStorage.setItem(chave, JSON.stringify(valor));
-    }
+  function excluirQuatroPrimeirosEPIs() {
+    let epis = carregarLocal('epis');
+    epis = epis.slice(4); // Remove os 4 primeiros
+    salvarLocal('epis', epis);
+  }
 
-    function renderizarEstoque() {
-      const tbody = document.querySelector('#tabelaEstoque tbody');
-      const epis = carregarLocal('epis');
-      tbody.innerHTML = '';
+  function renderizarEstoque() {
+    const tbody = document.querySelector('#tabelaEstoque tbody');
+    const epis = carregarLocal('epis');
+    tbody.innerHTML = '';
 
-      epis.forEach((epi) => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${epi.nome}</td>
-            <td>${epi.quantidade}</td>
-            <td>${epi.categoria}</td>
-            <td>${epi.tamanho || '-'}</td>
-            <td>
-              <button class="btn-azul" onclick="editarEpi('${epi.id}')">Editar</button>
-              <button class="btn-vermelho" onclick="deletarEpi('${epi.id}')">Excluir</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function editarEpi(id) {
-  window.location.href = `editar_epi.html?id=${encodeURIComponent(id)}`;
-}
-
-    function deletarEpi(id) {
-      let epis = carregarLocal('epis');
-      epis = epis.filter((e) => e.id !== id);
-      salvarLocal('epis', epis);
-      renderizarEstoque();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      renderizarEstoque();
-
-      // Adicionar EPI ao estoque
-      const form = document.querySelector('#formAdicionarEPI');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();  // Impede o envio do formulário
-
-        // Dados do novo EPI
-        const novoEpi = {
-          id: crypto.randomUUID(),  // Gera um ID único
-          nome: form.nome.value,
-          quantidade: parseInt(form.quantidade.value),
-          categoria: form.categoria.value,
-          tamanho: form.tamanho.value || ''  // Se não houver tamanho, deixa vazio
-        };
-
-        // Carrega os EPIs existentes do localStorage
-        const epis = carregarLocal('epis');
-        
-        // Adiciona o novo EPI ao array
-        epis.push(novoEpi);
-
-        // Salva novamente no localStorage
-        salvarLocal('epis', epis);
-
-        // Limpa o formulário e renderiza o estoque atualizado
-        form.reset();
-        renderizarEstoque();
-      });
-
-      // Filtro de busca
-    document.querySelector('#buscaNome').addEventListener('input', function () {
-  const filtro = this.value.toLowerCase();
-  const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-  linhas.forEach(linha => {
-    const nome = linha.cells[0].textContent.toLowerCase();
-    const categoria = linha.cells[2].textContent.toLowerCase();
-    const tamanho = linha.cells[3].textContent.toLowerCase();
-    const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
-    linha.style.display = corresponde ? '' : 'none';
-  });
-});
+    epis.forEach((epi) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${epi.nome}</td>
+          <td>${epi.quantidade}</td>
+          <td>${epi.categoria}</td>
+          <td>${epi.tamanho || '-'}</td>
+          <td>
+            <button class="btn-azul" onclick="editarEpi('${epi.id}')">Editar</button>
+            <button class="btn-vermelho" onclick="deletarEpi('${epi.id}')">Excluir</button>
+          </td>
+        </tr>
+      `;
     });
-  </script>
-</body>
-</html>
+  }
+
+  function editarEpi(id) {
+    window.location.href = `editar_epi.html?id=${encodeURIComponent(id)}`;
+  }
+
+  function deletarEpi(id) {
+    let epis = carregarLocal('epis');
+    epis = epis.filter((e) => e.id !== id);
+    salvarLocal('epis', epis);
+    renderizarEstoque();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    excluirQuatroPrimeirosEPIs(); // Remove os 4 primeiros ao carregar
+    renderizarEstoque();
+
+    // Adicionar EPI ao estoque
+    const form = document.querySelector('#formAdicionarEPI');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const novoEpi = {
+        id: crypto.randomUUID(),
+        nome: form.nome.value,
+        quantidade: parseInt(form.quantidade.value),
+        categoria: form.categoria.value,
+        tamanho: form.tamanho.value || ''
+      };
+
+      const epis = carregarLocal('epis');
+      epis.push(novoEpi);
+      salvarLocal('epis', epis);
+
+      form.reset();
+      renderizarEstoque();
+    });
+
+    // Filtro de busca
+    document.querySelector('#buscaNome').addEventListener('input', function () {
+      const filtro = this.value.toLowerCase();
+      const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+      linhas.forEach(linha => {
+        const nome = linha.cells[0].textContent.toLowerCase();
+        const categoria = linha.cells[2].textContent.toLowerCase();
+        const tamanho = linha.cells[3].textContent.toLowerCase();
+        const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
+        linha.style.display = corresponde ? '' : 'none';
+      });
+    });
+  });
+</script>
