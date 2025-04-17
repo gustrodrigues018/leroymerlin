@@ -41,9 +41,6 @@
     <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
     <button type="submit">Adicionar EPI</button>
   </form>
-<div style="text-align:center; margin: 20px;">
-  <button onclick="excluirQuatroPrimeirosEPIs()" class="btn-vermelho">Excluir 4 primeiros EPIs</button>
-</div>
 
 <div class="centralizado">
   <input type="text" id="buscaNome" placeholder="Filtrar por Nome, Categoria ou Tamanho..." />
@@ -71,18 +68,6 @@
   </div>
 
   <script>
-
-    function excluirQuatroPrimeirosEPIs() {
-  let epis = carregarLocal('epis');
-  epis = epis.slice(4); // Remove os 4 primeiros
-  salvarLocal('epis', epis);
-  renderizarEstoque();
-}
-document.addEventListener('DOMContentLoaded', () => {
-  excluirQuatroPrimeirosEPIs(); // CHAMADA AQUI
-  renderizarEstoque();
-  ...
-});
 
     function carregarLocal(chave) {
       return JSON.parse(localStorage.getItem(chave)) || [];
