@@ -4,36 +4,63 @@
   <meta charset="UTF-8" />
   <title>Retirada de EPIs</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .btn-azul {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-azul:hover {
+      background-color: #1976D2;
+    }
+
+    .btn-vermelho {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-vermelho:hover {
+      background-color: #d32f2f;
+    }
+  </style>
 </head>
 <body>
   <h1>Retirada de EPIs</h1>
 
- <form id="formRetirada">
-  <input type="text" name="ldap" placeholder="Matricula do funcionário" required />
-  <input type="text" name="nome_colaborador" placeholder="Nome do funcionário" required />
-  <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
-  <input type="number" name="quantidade" placeholder="Quantidade a retirar" required />
-  <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
-  <button type="submit">Registrar Retirada</button>
-</form>
+  <form id="formRetirada">
+    <input type="text" name="ldap" placeholder="Matricula do funcionário" required />
+    <input type="text" name="nome_colaborador" placeholder="Nome do funcionário" required />
+    <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
+    <input type="number" name="quantidade" placeholder="Quantidade a retirar" required />
+    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
+    <button type="submit">Registrar Retirada</button>
+  </form>
 
-<h1>Historico de retirada</h1>  
-<div class="centralizado">
-  <input type="text" id="buscaLdap" placeholder="Filtrar por Matricula..." />
-</div>
+  <h1>Histórico de Retirada</h1>
+  <div class="centralizado">
+    <input type="text" id="buscaLdap" placeholder="Filtrar por Matricula..." />
+  </div>
 
   <table border="1" id="tabelaRetiradas">
-   <thead>
-  <tr>
-    <th>Data</th>
-    <th>Matricula</th>
-    <th>Colaborador</th>
-    <th>Nome do EPI</th>
-    <th>Quantidade</th>
-    <th>Tamanho</th>
-    <th>Ações</th>
-  </tr>
-</thead>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Matricula</th>
+        <th>Colaborador</th>
+        <th>Nome do EPI</th>
+        <th>Quantidade</th>
+        <th>Tamanho</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
     <tbody>
       <!-- Populado via JS -->
     </tbody>
@@ -42,10 +69,84 @@
   <div style="text-align:center; margin: 20px;">
     <a href="estoque.html"><button>Ir ao Estoque</button></a>
     <a href="index.html"><button>Voltar ao Início</button></a>
-
   </div>
 
   <script src="script.js"></script>
+  <script>
+    function carregarLocal(chave) {
+      return JSON.parse(localStorage.getItem(chave)) || [];
+    }
+
+    function salvarLocal(chave, valor) {
+      localStorage.setItem(chave, JSON.stringify(valor));
+    }
+
+    function renderizarRetiradas() {
+      const tbody = document.querySelector('#tabelaRetiradas tbody');
+      const retiradas = carregarLocal('retiradas');
+      tbody.innerHTML = '';
+
+      retiradas.forEach((r, index) => {
+        const data = new Date(r.data).toLocaleString();
+        tbody.innerHTML += `
+          <tr>
+            <td>${data}</td>
+            <td>${r.ldap}</td>
+            <td>${r.nome_colaborador}</td>
+            <td>${r.nome_epi}</td>
+            <td>${r.quantidade}</td>
+            <td>${r.tamanho || '-'}</td>
+            <td>
+              <button class="btn-azul" onclick="editarRetirada(${index})">Editar</button>
+              <button class="btn-vermelho" onclick="deletarRetirada(${index})">Excluir</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function editarRetirada(index) {
+      window.location.href = `editar_retirada.html?id=${index}`;
+    }
+
+    function deletarRetirada(index) {
+      const retiradas = carregarLocal('retiradas');
+      retiradas.splice(index, 1);
+      salvarLocal('retiradas', retiradas);
+      renderizarRetiradas();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderizarRetiradas();
+
+      const form = document.querySelector('#formRetirada');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nova = {
+          data: new Date().toISOString(),
+          ldap: form.ldap.value,
+          nome_colaborador: form.nome_colaborador.value,
+          nome_epi: form.nome_epi.value,
+          quantidade: parseInt(form.quantidade.value),
+          tamanho: form.tamanho.value
+        };
+        const retiradas = carregarLocal('retiradas');
+        retiradas.push(nova);
+        salvarLocal('retiradas', retiradas);
+        form.reset();
+        renderizarRetiradas();
+      });
+
+      document.querySelector('#buscaLdap').addEventListener('input', function () {
+        const filtro = this.value.toLowerCase();
+        const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
+        linhas.forEach(linha => {
+          const matricula = linha.cells[1].textContent.toLowerCase();
+          linha.style.display = matricula.includes(filtro) ? '' : 'none';
+        });
+      });
+    });
+  </script>
 </body>
 </html>
-  </div>
+
