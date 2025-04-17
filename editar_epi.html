@@ -26,8 +26,8 @@
       <label for="tamanho">Tamanho:</label>
       <input type="text" id="tamanho" name="tamanho">
 
-      <button type="submit">Salvar Alterações</button>
-      <button type="button" onclick="fecharModalEditar()">Cancelar</button>
+      <button type="submit" class="btn-azul">Salvar Alterações</button>
+      <button type="button" class="btn-azul-cancelar" onclick="fecharModalEditar()">Cancelar</button>
     </form>
   </div>
 
@@ -156,8 +156,9 @@
       font-weight: bold;
     }
 
-    button {
-      background-color: #4CAF50;
+    /* Estilos dos botões */
+    .btn-azul {
+      background-color: #007BFF;
       color: white;
       padding: 10px 20px;
       border: none;
@@ -167,9 +168,26 @@
       font-size: 18px;
     }
 
-    button:hover {
-      background-color: #45a049;
+    .btn-azul:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-azul-cancelar {
+      background-color: #dc3545;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 18px;
+    }
+
+    .btn-azul-cancelar:hover {
+      background-color: #c82333;
     }
   </style>
+
 </body>
 </html>
+
