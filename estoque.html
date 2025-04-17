@@ -42,9 +42,10 @@
     <button type="submit">Adicionar EPI</button>
   </form>
 
-  <div class="centralizado">
-    <input type="text" id="buscaNome" placeholder="Filtrar por Nome do EPI..." />
-  </div>
+<div class="centralizado">
+  <input type="text" id="buscaNome" placeholder="Filtrar por Nome, Categoria ou Tamanho..." />
+</div>
+
 
   <table border="1" id="tabelaEstoque">
     <thead>
@@ -139,14 +140,17 @@
       });
 
       // Filtro de busca
-      document.querySelector('#buscaNome').addEventListener('input', function () {
-        const filtro = this.value.toLowerCase();
-        const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-        linhas.forEach(linha => {
-          const nomeEpi = linha.cells[0].textContent.toLowerCase();
-          linha.style.display = nomeEpi.includes(filtro) ? '' : 'none';
-        });
-      });
+    document.querySelector('#buscaNome').addEventListener('input', function () {
+  const filtro = this.value.toLowerCase();
+  const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+  linhas.forEach(linha => {
+    const nome = linha.cells[0].textContent.toLowerCase();
+    const categoria = linha.cells[2].textContent.toLowerCase();
+    const tamanho = linha.cells[3].textContent.toLowerCase();
+    const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
+    linha.style.display = corresponde ? '' : 'none';
+  });
+});
     });
   </script>
 </body>
