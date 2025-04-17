@@ -72,81 +72,81 @@
   </div>
 
   <script src="script.js"></script>
-  <script>
-    function carregarLocal(chave) {
-      return JSON.parse(localStorage.getItem(chave)) || [];
-    }
+ <script>
+  function carregarLocal(chave) {
+    return JSON.parse(localStorage.getItem(chave)) || [];
+  }
 
-    function salvarLocal(chave, valor) {
-      localStorage.setItem(chave, JSON.stringify(valor));
-    }
+  function salvarLocal(chave, valor) {
+    localStorage.setItem(chave, JSON.stringify(valor));
+  }
 
-    function renderizarRetiradas() {
-      const tbody = document.querySelector('#tabelaRetiradas tbody');
+  function renderizarRetiradas() {
+    const tbody = document.querySelector('#tabelaRetiradas tbody');
+    const retiradas = carregarLocal('retiradas');
+    tbody.innerHTML = '';
+
+    retiradas.forEach((r) => {
+      const data = new Date(r.data).toLocaleString();
+      tbody.innerHTML += `
+        <tr>
+          <td>${data}</td>
+          <td>${r.ldap}</td>
+          <td>${r.nome_colaborador}</td>
+          <td>${r.nome_epi}</td>
+          <td>${r.quantidade}</td>
+          <td>${r.tamanho || '-'}</td>
+          <td>
+            <button class="btn-azul" onclick="editarRetirada('${r.ldap}')">Editar</button>
+            <button class="btn-vermelho" onclick="deletarRetirada('${r.ldap}')">Excluir</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function editarRetirada(ldap) {
+    window.location.href = `editar_retirada.html?ldap=${encodeURIComponent(ldap)}`;
+  }
+
+  function deletarRetirada(ldap) {
+    let retiradas = carregarLocal('retiradas');
+    retiradas = retiradas.filter(r => r.ldap !== ldap);
+    salvarLocal('retiradas', retiradas);
+    renderizarRetiradas();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderizarRetiradas();
+
+    const form = document.querySelector('#formRetirada');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nova = {
+        data: new Date().toISOString(),
+        ldap: form.ldap.value,
+        nome_colaborador: form.nome_colaborador.value,
+        nome_epi: form.nome_epi.value,
+        quantidade: parseInt(form.quantidade.value),
+        tamanho: form.tamanho.value
+      };
       const retiradas = carregarLocal('retiradas');
-      tbody.innerHTML = '';
-
-      retiradas.forEach((r, index) => {
-        const data = new Date(r.data).toLocaleString();
-        tbody.innerHTML += `
-          <tr>
-            <td>${data}</td>
-            <td>${r.ldap}</td>
-            <td>${r.nome_colaborador}</td>
-            <td>${r.nome_epi}</td>
-            <td>${r.quantidade}</td>
-            <td>${r.tamanho || '-'}</td>
-            <td>
-              <button class="btn-azul" onclick="editarRetirada(${index})">Editar</button>
-              <button class="btn-vermelho" onclick="deletarRetirada(${index})">Excluir</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function editarRetirada(index) {
-      window.location.href = `editar_retirada.html?id=${index}`;
-    }
-
-    function deletarRetirada(index) {
-      const retiradas = carregarLocal('retiradas');
-      retiradas.splice(index, 1);
+      retiradas.push(nova);
       salvarLocal('retiradas', retiradas);
+      form.reset();
       renderizarRetiradas();
-    }
+    });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      renderizarRetiradas();
-
-      const form = document.querySelector('#formRetirada');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const nova = {
-          data: new Date().toISOString(),
-          ldap: form.ldap.value,
-          nome_colaborador: form.nome_colaborador.value,
-          nome_epi: form.nome_epi.value,
-          quantidade: parseInt(form.quantidade.value),
-          tamanho: form.tamanho.value
-        };
-        const retiradas = carregarLocal('retiradas');
-        retiradas.push(nova);
-        salvarLocal('retiradas', retiradas);
-        form.reset();
-        renderizarRetiradas();
-      });
-
-      document.querySelector('#buscaLdap').addEventListener('input', function () {
-        const filtro = this.value.toLowerCase();
-        const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
-        linhas.forEach(linha => {
-          const matricula = linha.cells[1].textContent.toLowerCase();
-          linha.style.display = matricula.includes(filtro) ? '' : 'none';
-        });
+    document.querySelector('#buscaLdap').addEventListener('input', function () {
+      const filtro = this.value.toLowerCase();
+      const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
+      linhas.forEach(linha => {
+        const matricula = linha.cells[1].textContent.toLowerCase();
+        linha.style.display = matricula.includes(filtro) ? '' : 'none';
       });
     });
-  </script>
+  });
+</script>
 </body>
 </html>
 
