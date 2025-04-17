@@ -34,8 +34,13 @@
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
-
-  <h1>Estoque de EPIs</h1>
+ <form id="formAdicionarEPI">
+    <input type="text" name="nome" placeholder="Nome do EPI" required />
+    <input type="number" name="quantidade" placeholder="Quantidade" required />
+    <input type="text" name="categoria" placeholder="Categoria do EPI" required />
+    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
+    <button type="submit">Adicionar EPI</button>
+  </form>
   <div class="centralizado">
     <input type="text" id="buscaNome" placeholder="Filtrar por Nome do EPI..." />
   </div>
@@ -90,7 +95,7 @@
     }
 
     function editarEpi(id) {
-      window.location.href = `editar-epi.html?id=${encodeURIComponent(id)}`;
+      window.location.href = `editar_epi.html?id=${encodeURIComponent(id)}`;
     }
 
     function deletarEpi(id) {
