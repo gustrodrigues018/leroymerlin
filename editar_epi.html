@@ -86,17 +86,17 @@
     }
 
     // Carregar o EPI para edição ao carregar a página
-    document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const epiId = parseInt(urlParams.get('id'));
+   document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const epiId = urlParams.get('id');
 
-      if (epiId) {
-        carregarEpiParaEdicao(epiId);
-      } else {
-        alert('ID do EPI não fornecido.');
-        window.location.href = 'estoque.html'; // Redireciona caso o ID não tenha sido passado
-      }
-    });
+  if (epiId) {
+    carregarEpiParaEdicao(epiId);
+  } else {
+    alert('ID do EPI não fornecido.');
+    window.location.href = 'estoque.html';
+  }
+});
   </script>
 
   <style>
