@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Estoque de EPIs - Leroy Merlin</title>
-  <link rel="stylesheet" href="style.css" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estoque de EPIs</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
@@ -42,5 +42,76 @@
   </div>
 
   <script src="script.js"></script>
-</body>
-</html>
+  <script>
+    // Função para renderizar os EPIs na tabela
+    function renderizarEpis() {
+      const tbody = document.querySelector('#tabelaEpis tbody');
+      if (!tbody) return;
+      const epis = carregarLocal('epis');
+      tbody.innerHTML = ''; // Limpa a tabela
+
+      epis.forEach(e => {
+        const dataFormatada = new Date(e.data).toLocaleString();
+        tbody.innerHTML += `
+          <tr>
+            <td>${e.id}</td>
+            <td>${e.nome}</td>
+            <td>${e.quantidade}</td>
+            <td>${e.categoria}</td>
+            <td>${e.tamanho || '-'}</td>
+            <td>${dataFormatada}</td>
+            <td>
+              <button onclick="editarEpi(${e.id})">Editar</button>
+              <button onclick="deletarEPI(${e.id})">EXCLUIR</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Função para editar EPI - Redireciona para a página de edição
+    function editarEpi(id) {
+      window.location.href = `editar_epi.html?id=${id}`;
+    }
+
+    // Função para deletar EPI
+    function deletarEPI(id) {
+      let epis = carregarLocal('epis');
+      epis = epis.filter(e => e.id !== id);
+      salvarLocal('epis', epis);
+      renderizarEpis();
+    }
+
+    // Função para adicionar EPI ao estoque
+    function adicionarEPI(nome, quantidade, categoria, tamanho) {
+      const epis = carregarLocal('epis');
+      const novo = {
+        id: Date.now(),
+        nome,
+        quantidade: parseInt(quantidade),
+        categoria,
+        tamanho: tamanho || '-',
+        data: new Date().toISOString()
+      };
+      epis.push(novo);
+      salvarLocal('epis', epis);
+      renderizarEpis();
+    }
+
+    // Adicionar EPI através do formulário
+    document.addEventListener('DOMContentLoaded', () => {
+      // Renderizar EPIs na página
+      renderizarEpis();
+
+      // Formulário de Adicionar EPI
+      const formAdicionar = document.querySelector('#formAdicionar');
+      if (formAdicionar) {
+        formAdicionar.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const form = e.target;
+          adicionarEPI(form.nome.value, form.quantidade.value, form.categoria.value, form.tamanho.value);
+          form.reset();
+        });
+      }
+    });
+  </script>
