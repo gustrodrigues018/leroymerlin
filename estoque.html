@@ -1,192 +1,118 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Editar EPI</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <h1>Editar EPI</h1>
-
-  <div class="form-container">
-    <form id="formEditarEPI" onsubmit="salvarEdicaoEPI(event)">
-      <input type="hidden" id="idEpi" name="idEpi">
-
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" name="nome" required>
-
-      <label for="quantidade">Quantidade:</label>
-      <input type="number" id="quantidade" name="quantidade" required>
-
-      <label for="categoria">Categoria:</label>
-      <input type="text" id="categoria" name="categoria" required>
-
-      <label for="tamanho">Tamanho:</label>
-      <input type="text" id="tamanho" name="tamanho">
-
-      <button type="submit" class="btn-azul">Salvar Alterações</button>
-      <button type="button" class="btn-azul-cancelar" onclick="fecharModalEditar()">Cancelar</button>
-    </form>
-  </div>
-
-  <script src="script.js"></script>
-  <script>
-    // Função para preencher o formulário de edição com os dados do EPI
-    function carregarEpiParaEdicao(id) {
-      const epis = carregarLocal('epis');
-      const epi = epis.find(e => e.id === id);
-
-      if (epi) {
-        // Preencher os campos do formulário com os dados do EPI
-        document.querySelector('#idEpi').value = epi.id;
-        document.querySelector('#nome').value = epi.nome;
-        document.querySelector('#quantidade').value = epi.quantidade;
-        document.querySelector('#categoria').value = epi.categoria;
-        document.querySelector('#tamanho').value = epi.tamanho || '';
-      } else {
-        alert('EPI não encontrado.');
-      }
-    }
-
-    // Função para salvar as alterações feitas no EPI
-    function salvarEdicaoEPI(event) {
-      event.preventDefault(); // Evita o envio padrão do formulário
-
-      const form = event.target;
-      const idEpi = form.idEpi.value;
-      const nome = form.nome.value;
-      const quantidade = form.quantidade.value;
-      const categoria = form.categoria.value;
-      const tamanho = form.tamanho.value;
-
-      const epis = carregarLocal('epis');
-      const epiIndex = epis.findIndex(e => e.id == idEpi);
-
-      if (epiIndex !== -1) {
-        epis[epiIndex] = {
-          ...epis[epiIndex],
-          nome,
-          quantidade: parseInt(quantidade),
-          categoria,
-          tamanho
-        };
-        salvarLocal('epis', epis);
-        alert('EPI atualizado com sucesso!');
-        window.location.href = 'estoque.html'; // Redireciona de volta para a página de estoque
-      } else {
-        alert('Erro ao editar o EPI.');
-      }
-    }
-
-    // Função para fechar o modal de edição
-    function fecharModalEditar() {
-      window.location.href = 'estoque.html'; // Redireciona para a página de estoque sem salvar
-    }
-
-    // Carregar o EPI para edição ao carregar a página
-    document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const epiId = parseInt(urlParams.get('id'));
-
-      if (epiId) {
-        carregarEpiParaEdicao(epiId);
-      } else {
-        alert('ID do EPI não fornecido.');
-        window.location.href = 'estoque.html'; // Redireciona caso o ID não tenha sido passado
-      }
-    });
-  </script>
-
+  <meta charset="UTF-8" />
+  <title>Estoque de EPIs</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    /* Estilos do formulário */
-    .form-container {
-      margin-top: 10px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 50px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 700px;
-      text-align: center;
-    }
-
-    .form-container input[type="submit"],
-    .form-container button {
-      width: 100%;
-      padding: 18px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .form-container input[type="submit"]:hover,
-    .form-container button:hover {
-      background-color: #45a049;
-    }
-
-    .form-container input[type="text"],
-    .form-container input[type="number"],
-    .form-container textarea,
-    .form-container input[type="file"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-
-    /* Estilos dos botões */
     .btn-azul {
-      background-color: #007BFF;
+      background-color: #2196F3;
       color: white;
-      padding: 10px 20px;
       border: none;
+      padding: 8px 12px;
       border-radius: 4px;
       cursor: pointer;
-      width: 100%;
-      font-size: 18px;
     }
 
     .btn-azul:hover {
-      background-color: #0056b3;
+      background-color: #1976D2;
     }
 
-    .btn-azul-cancelar {
-      background-color: #dc3545;
+    .btn-vermelho {
+      background-color: #f44336;
       color: white;
-      padding: 10px 20px;
       border: none;
+      padding: 8px 12px;
       border-radius: 4px;
       cursor: pointer;
-      width: 100%;
-      font-size: 18px;
     }
 
-    .btn-azul-cancelar:hover {
-      background-color: #c82333;
+    .btn-vermelho:hover {
+      background-color: #d32f2f;
     }
   </style>
+</head>
+<body>
+  <h1>Estoque de EPIs</h1>
 
+  <h1>Estoque de EPIs</h1>
+  <div class="centralizado">
+    <input type="text" id="buscaNome" placeholder="Filtrar por Nome do EPI..." />
+  </div>
+
+  <table border="1" id="tabelaEstoque">
+    <thead>
+      <tr>
+        <th>Nome do EPI</th>
+        <th>Quantidade</th>
+        <th>Categoria</th>
+        <th>Tamanho</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Populado via JS -->
+    </tbody>
+  </table>
+
+  <div style="text-align:center; margin: 20px;">
+    <a href="index.html"><button>Voltar ao Início</button></a>
+  </div>
+
+  <script>
+    function carregarLocal(chave) {
+      return JSON.parse(localStorage.getItem(chave)) || [];
+    }
+
+    function salvarLocal(chave, valor) {
+      localStorage.setItem(chave, JSON.stringify(valor));
+    }
+
+    function renderizarEstoque() {
+      const tbody = document.querySelector('#tabelaEstoque tbody');
+      const epis = carregarLocal('epis');
+      tbody.innerHTML = '';
+
+      epis.forEach((epi) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${epi.nome}</td>
+            <td>${epi.quantidade}</td>
+            <td>${epi.categoria}</td>
+            <td>${epi.tamanho || '-'}</td>
+            <td>
+              <button class="btn-azul" onclick="editarEpi('${epi.id}')">Editar</button>
+              <button class="btn-vermelho" onclick="deletarEpi('${epi.id}')">Excluir</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function editarEpi(id) {
+      window.location.href = `editar-epi.html?id=${encodeURIComponent(id)}`;
+    }
+
+    function deletarEpi(id) {
+      let epis = carregarLocal('epis');
+      epis = epis.filter((e) => e.id !== id);
+      salvarLocal('epis', epis);
+      renderizarEstoque();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderizarEstoque();
+
+      document.querySelector('#buscaNome').addEventListener('input', function () {
+        const filtro = this.value.toLowerCase();
+        const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+        linhas.forEach(linha => {
+          const nomeEpi = linha.cells[0].textContent.toLowerCase();
+          linha.style.display = nomeEpi.includes(filtro) ? '' : 'none';
+        });
+      });
+    });
+  </script>
 </body>
 </html>
+
