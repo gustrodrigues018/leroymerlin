@@ -2,69 +2,81 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Estoque de EPIs</title>
+  <title>Editar EPI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .btn-azul {
+    .form-container {
+      margin-top: 10px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 50px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .form-container input,
+    .form-container button {
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .form-container button {
       background-color: #2196F3;
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
+      transition: background-color 0.3s ease;
       cursor: pointer;
     }
 
-    .btn-azul:hover {
+    .form-container button:hover {
       background-color: #1976D2;
     }
 
-    .btn-vermelho {
-      background-color: #f44336;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
     }
 
-    .btn-vermelho:hover {
-      background-color: #d32f2f;
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      text-align: left;
     }
   </style>
 </head>
 <body>
-  <h1>Estoque de EPIs</h1>
 
-  <form id="formAdicionarEPI">
-    <input type="text" name="nome" placeholder="Nome do EPI" required />
-    <input type="number" name="quantidade" placeholder="Quantidade" required />
-    <input type="text" name="categoria" placeholder="Categoria do EPI" required />
-    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
-    <button type="submit">Adicionar EPI</button>
-  </form>
+  <h1>Editar EPI</h1>
 
-  <div class="centralizado">
-    <input type="text" id="buscaNome" placeholder="Filtrar por Nome, Categoria ou Tamanho..." />
-  </div>
+  <div class="form-container">
+    <form id="formEditarEPI" onsubmit="salvarEdicaoEPI(event)">
+      <input type="hidden" id="idEPI" name="idEPI">
 
-  <table border="1" id="tabelaEstoque">
-    <thead>
-      <tr>
-        <th>Nome do EPI</th>
-        <th>Quantidade</th>
-        <th>Categoria</th>
-        <th>Tamanho</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Populado via JS -->
-    </tbody>
-  </table>
+      <label for="nome">Nome do EPI:</label>
+      <input type="text" id="nome" name="nome" required>
 
-  <div style="text-align:center; margin: 20px;">
-    <a href="index.html"><button>Voltar ao Início</button></a>
-    <a href="retiradas.html"><button>Ir para Retiradas</button></a>
+      <label for="quantidade">Quantidade:</label>
+      <input type="number" id="quantidade" name="quantidade" required>
+
+      <label for="categoria">Categoria:</label>
+      <input type="text" id="categoria" name="categoria" required>
+
+      <label for="tamanho">Tamanho:</label>
+      <input type="text" id="tamanho" name="tamanho">
+
+      <button type="submit">Salvar Alterações</button>
+      <button type="button" onclick="voltarParaEstoque()">Cancelar</button>
+    </form>
   </div>
 
   <script>
@@ -76,74 +88,67 @@
       localStorage.setItem(chave, JSON.stringify(valor));
     }
 
-    function renderizarEstoque() {
-      const tbody = document.querySelector('#tabelaEstoque tbody');
+    function carregarEPIParaEdicao(id) {
       const epis = carregarLocal('epis');
-      tbody.innerHTML = '';
+      const epi = epis.find(e => e.id === id);
 
-      epis.forEach((epi) => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${epi.nome}</td>
-            <td>${epi.quantidade}</td>
-            <td>${epi.categoria}</td>
-            <td>${epi.tamanho || '-'}</td>
-            <td>
-              <button class="btn-azul" onclick="editarEpi('${epi.id}')">Editar</button>
-              <button class="btn-vermelho" onclick="deletarEpi('${epi.id}')">Excluir</button>
-            </td>
-          </tr>
-        `;
-      });
+      if (epi) {
+        document.querySelector('#idEPI').value = epi.id;
+        document.querySelector('#nome').value = epi.nome;
+        document.querySelector('#quantidade').value = epi.quantidade;
+        document.querySelector('#categoria').value = epi.categoria;
+        document.querySelector('#tamanho').value = epi.tamanho || '';
+      } else {
+        alert('EPI não encontrado.');
+        window.location.href = 'index.html';
+      }
     }
 
-    function editarEpi(id) {
-      window.location.href = `editar_epi.html?id=${encodeURIComponent(id)}`;
+    function salvarEdicaoEPI(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const id = form.idEPI.value;
+      const nome = form.nome.value;
+      const quantidade = parseInt(form.quantidade.value);
+      const categoria = form.categoria.value;
+      const tamanho = form.tamanho.value;
+
+      const epis = carregarLocal('epis');
+      const index = epis.findIndex(e => e.id === id);
+
+      if (index !== -1) {
+        epis[index] = {
+          ...epis[index],
+          nome,
+          quantidade,
+          categoria,
+          tamanho
+        };
+        salvarLocal('epis', epis);
+        alert('EPI atualizado com sucesso!');
+        window.location.href = 'estoque.html';
+      } else {
+        alert('Erro ao editar o EPI.');
+      }
     }
 
-    function deletarEpi(id) {
-      let epis = carregarLocal('epis');
-      epis = epis.filter((e) => e.id !== id);
-      salvarLocal('epis', epis);
-      renderizarEstoque();
+    function voltarParaEstoque() {
+      window.location.href = 'estoque.html';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      renderizarEstoque();
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
 
-      const form = document.querySelector('#formAdicionarEPI');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const novoEpi = {
-          id: crypto.randomUUID(),
-          nome: form.nome.value,
-          quantidade: parseInt(form.quantidade.value),
-          categoria: form.categoria.value,
-          tamanho: form.tamanho.value || ''
-        };
-
-        const epis = carregarLocal('epis');
-        epis.push(novoEpi);
-        salvarLocal('epis', epis);
-
-        form.reset();
-        renderizarEstoque();
-      });
-
-      document.querySelector('#buscaNome').addEventListener('input', function () {
-        const filtro = this.value.toLowerCase();
-        const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-        linhas.forEach(linha => {
-          const nome = linha.cells[0].textContent.toLowerCase();
-          const categoria = linha.cells[2].textContent.toLowerCase();
-          const tamanho = linha.cells[3].textContent.toLowerCase();
-          const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
-          linha.style.display = corresponde ? '' : 'none';
-        });
-      });
+      if (id) {
+        carregarEPIParaEdicao(id);
+      } else {
+        alert('ID do EPI não fornecido.');
+        window.location.href = 'estoque.html';
+      }
     });
   </script>
+
 </body>
 </html>
-
