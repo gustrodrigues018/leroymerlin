@@ -120,6 +120,110 @@
     <a href="index.html"><button>Voltar ao Início</button></a>
   </div>
 
-  <script src="script.js"></script>
+  <script>// Função para carregar os EPIs da memória local (localStorage)
+function carregarEpis() {
+  const epis = JSON.parse(localStorage.getItem('epis')) || [];
+  const tabela = document.getElementById('tabelaEpis').getElementsByTagName('tbody')[0];
+  tabela.innerHTML = ''; // Limpa a tabela
+
+  epis.forEach((epi, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${epi.id}</td>
+      <td>${epi.nome}</td>
+      <td>${epi.quantidade}</td>
+      <td>${epi.categoria}</td>
+      <td>${epi.tamanho || 'N/A'}</td>
+      <td>${epi.data}</td>
+      <td>
+        <button class="btn-editar" onclick="abrirModal(${index})">Editar</button>
+      </td>
+    `;
+    tabela.appendChild(tr);
+  });
+}
+
+// Função para adicionar um novo EPI
+function adicionarEpi(event) {
+  event.preventDefault();
+
+  const nome = event.target.nome.value;
+  const quantidade = event.target.quantidade.value;
+  const categoria = event.target.categoria.value;
+  const tamanho = event.target.tamanho.value;
+
+  if (!nome || !quantidade || !categoria) {
+    alert('Por favor, preencha os campos obrigatórios.');
+    return;
+  }
+
+  const epi = {
+    id: Date.now(), // Usando o timestamp como ID único
+    nome,
+    quantidade,
+    categoria,
+    tamanho,
+    data: new Date().toLocaleDateString(),
+  };
+
+  const epis = JSON.parse(localStorage.getItem('epis')) || [];
+  epis.push(epi);
+  localStorage.setItem('epis', JSON.stringify(epis));
+
+  event.target.reset(); // Limpa o formulário
+  carregarEpis(); // Atualiza a tabela
+}
+
+// Função para abrir o modal de edição
+function abrirModal(index) {
+  const epis = JSON.parse(localStorage.getItem('epis'));
+  const epi = epis[index];
+
+  document.getElementById('editNome').value = epi.nome;
+  document.getElementById('editQuantidade').value = epi.quantidade;
+  document.getElementById('editCategoria').value = epi.categoria;
+  document.getElementById('editTamanho').value = epi.tamanho || '';
+
+  const modalOverlay = document.querySelector('.modal-overlay');
+  modalOverlay.style.display = 'flex';
+
+  // Salvar as alterações ao clicar no botão "Salvar"
+  document.getElementById('saveEdit').onclick = function () {
+    const nome = document.getElementById('editNome').value;
+    const quantidade = document.getElementById('editQuantidade').value;
+    const categoria = document.getElementById('editCategoria').value;
+    const tamanho = document.getElementById('editTamanho').value;
+
+    if (!nome || !quantidade || !categoria) {
+      alert('Por favor, preencha os campos obrigatórios.');
+      return;
+    }
+
+    epi.nome = nome;
+    epi.quantidade = quantidade;
+    epi.categoria = categoria;
+    epi.tamanho = tamanho;
+
+    epis[index] = epi;
+    localStorage.setItem('epis', JSON.stringify(epis));
+
+    fecharModal(); // Fecha o modal
+    carregarEpis(); // Atualiza a tabela
+  };
+}
+
+// Função para fechar o modal
+function fecharModal() {
+  document.querySelector('.modal-overlay').style.display = 'none';
+}
+
+// Inicializa a página carregando os EPIs da memória local
+document.addEventListener('DOMContentLoaded', () => {
+  carregarEpis(); // Carrega os EPIs ao iniciar a página
+
+  const formAdicionar = document.getElementById('formAdicionar');
+  formAdicionar.addEventListener('submit', adicionarEpi); // Adiciona o evento de submit para adicionar EPI
+});
+</script>
 </body>
 </html>
