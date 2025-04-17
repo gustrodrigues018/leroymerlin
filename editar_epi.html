@@ -2,57 +2,9 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar EPI</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    .form-container {
-      margin-top: 10px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 50px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 700px;
-      text-align: center;
-    }
-
-    .form-container input,
-    .form-container button {
-      width: 100%;
-      padding: 16px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-
-    .form-container button {
-      background-color: #1976D2;
-      color: white;
-      border: none;
-      transition: background-color 0.3s ease;
-      cursor: pointer;
-    }
-
-    .form-container button:hover {
-      background-color: #1976D2;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-      text-align: left;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -75,7 +27,7 @@
       <input type="text" id="tamanho" name="tamanho">
 
       <button type="submit">Salvar Alterações</button>
-      <button type="button" onclick="voltarParaEstoque()">Cancelar</button>
+      <button type="button" onclick="fecharModalEditar()">Cancelar</button>
     </form>
   </div>
 
@@ -133,8 +85,8 @@
       }
     }
 
-    function voltarParaEstoque() {
-      window.location.href = 'estoque.html';
+    function fecharModalEditar() {
+      window.location.href = 'index.html';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -145,10 +97,60 @@
         carregarEPIParaEdicao(id);
       } else {
         alert('ID do EPI não fornecido.');
-        window.location.href = 'estoque.html';
+        window.location.href = 'index.html';
       }
     });
   </script>
+
+  <style>
+    .form-container {
+      margin-top: 10px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 50px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .form-container input,
+    .form-container button {
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .form-container button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .form-container button:hover {
+      background-color: #45a049;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      text-align: left;
+    }
+  </style>
 
 </body>
 </html>
