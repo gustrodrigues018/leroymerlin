@@ -4,89 +4,36 @@
   <meta charset="UTF-8" />
   <title>Retirada de EPIs</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Botão azul para editar */
-    .btn-editar {
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-right: 5px;
-    }
-
-    .btn-editar:hover {
-      background-color: #0056b3;
-    }
-
-    .btn-excluir {
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-excluir:hover {
-      background-color: #a71d2a;
-    }
-
-    .centralizado {
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-    }
-
-    input, button {
-      margin: 5px;
-      padding: 8px;
-    }
-  </style>
 </head>
 <body>
   <h1>Retirada de EPIs</h1>
 
-  <form id="formRetirada">
-    <input type="text" name="ldap" placeholder="Matricula do funcionário" required />
-    <input type="text" name="nome_colaborador" placeholder="Nome do funcionário" required />
-    <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
-    <input type="number" name="quantidade" placeholder="Quantidade a retirar" required />
-    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
-    <button type="submit">Registrar Retirada</button>
-  </form>
+ <form id="formRetirada">
+  <input type="text" name="ldap" placeholder="Matricula do funcionário" required />
+  <input type="text" name="nome_colaborador" placeholder="Nome do funcionário" required />
+  <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
+  <input type="number" name="quantidade" placeholder="Quantidade a retirar" required />
+  <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
+  <button type="submit">Registrar Retirada</button>
+</form>
 
-  <h1>Histórico de Retirada</h1>  
-  <div class="centralizado">
-    <input type="text" id="buscaLdap" placeholder="Filtrar por Matricula..." />
-  </div>
+<h1>Historico de retirada</h1>  
+<div class="centralizado">
+  <input type="text" id="buscaLdap" placeholder="Filtrar por Matricula..." />
+</div>
 
   <table border="1" id="tabelaRetiradas">
-    <thead>
-      <tr>
-        <th>Data</th>
-        <th>Matricula</th>
-        <th>Colaborador</th>
-        <th>Nome do EPI</th>
-        <th>Quantidade</th>
-        <th>Tamanho</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
+   <thead>
+  <tr>
+    <th>Data</th>
+    <th>Matricula</th>
+    <th>Colaborador</th>
+    <th>Nome do EPI</th>
+    <th>Quantidade</th>
+    <th>Tamanho</th>
+    <th>Ações</th>
+  </tr>
+</thead>
     <tbody>
       <!-- Populado via JS -->
     </tbody>
@@ -95,95 +42,10 @@
   <div style="text-align:center; margin: 20px;">
     <a href="estoque.html"><button>Ir ao Estoque</button></a>
     <a href="index.html"><button>Voltar ao Início</button></a>
-  </div>
 
-  <script src="script.js"></script>
-  <script>
-    // Função para carregar do localStorage
-    function carregarLocal(chave) {
-      return JSON.parse(localStorage.getItem(chave)) || [];
-    }
-
-    // Função para salvar no localStorage
-    function salvarLocal(chave, valor) {
-      localStorage.setItem(chave, JSON.stringify(valor));
-    }
-
-    // Renderizar retiradas na tabela
-    function renderizarRetiradas() {
-      const tbody = document.querySelector('#tabelaRetiradas tbody');
-      const retiradas = carregarLocal('retiradas');
-      tbody.innerHTML = '';
-      retiradas.forEach((r) => {
-        const dataFormatada = new Date(r.data).toLocaleString();
-        tbody.innerHTML += `
-          <tr>
-            <td>${dataFormatada}</td>
-            <td>${r.ldap}</td>
-            <td>${r.nome_colaborador}</td>
-            <td>${r.nome_epi}</td>
-            <td>${r.quantidade}</td>
-            <td>${r.tamanho || '-'}</td>
-            <td>
-              <button class="btn-editar" onclick="editarRetirada(${r.id})">Editar</button>
-              <button class="btn-excluir" onclick="excluirRetirada(${r.id})">Excluir</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    // Redirecionar para editar
-    function editarRetirada(id) {
-      window.location.href = `editar_retirada.html?id=${id}`;
-    }
-
-    // Excluir retirada
-    function excluirRetirada(id) {
-      let retiradas = carregarLocal('retiradas');
-      retiradas = retiradas.filter(r => r.id !== id);
-      salvarLocal('retiradas', retiradas);
-      renderizarRetiradas();
-    }
-
-    // Registrar retirada
-    document.querySelector('#formRetirada').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const retirada = {
-        id: Date.now(),
-        ldap: form.ldap.value,
-        nome_colaborador: form.nome_colaborador.value,
-        nome_epi: form.nome_epi.value,
-        quantidade: parseInt(form.quantidade.value),
-        tamanho: form.tamanho.value || '-',
-        data: new Date().toISOString()
-      };
-
-      const retiradas = carregarLocal('retiradas');
-      retiradas.push(retirada);
-      salvarLocal('retiradas', retiradas);
-      form.reset();
-      renderizarRetiradas();
-    });
-
-    // Filtro por matrícula
-    document.querySelector('#buscaLdap').addEventListener('input', function(e) {
-      const filtro = e.target.value.toLowerCase();
-      const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
-      linhas.forEach(linha => {
-        const matricula = linha.children[1].textContent.toLowerCase();
-        linha.style.display = matricula.includes(filtro) ? '' : 'none';
-      });
-    });
-
-    // Inicialização
-    renderizarRetiradas();
-  </script>
-</body>
-</html>
   </div>
 
   <script src="script.js"></script>
 </body>
 </html>
+  </div>
