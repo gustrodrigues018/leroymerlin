@@ -3,115 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estoque de EPIs</title>
+  <title>Editar EPI</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Estoque de EPIs</h1>
 
-  <form id="formAdicionar">
-    <input type="text" name="nome" placeholder="Nome do EPI" required />
-    <input type="number" name="quantidade" placeholder="Quantidade" required />
-    <input type="text" name="categoria" placeholder="Categoria" required />
-    <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
-    <button type="submit">Adicionar EPI</button>
-  </form>
+  <h1>Editar EPI</h1>
 
-  <table border="1" id="tabelaEpis">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>Quantidade</th>
-        <th>Categoria</th>
-        <th>Tamanho</th>
-        <th>Data</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Populado via JS -->
-    </tbody>
-  </table>
+  <div class="form-container">
+    <form id="formEditarEPI" onsubmit="salvarEdicaoEPI(event)">
+      <input type="hidden" id="idEpi" name="idEpi">
 
-  <hr />
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" name="nome" required>
 
-  <div style="text-align:center; margin: 20px;">
-    <a href="retiradas.html"><button>Ir para Retiradas</button></a>
-    <a href="index.html"><button>Voltar ao Início</button></a>
+      <label for="quantidade">Quantidade:</label>
+      <input type="number" id="quantidade" name="quantidade" required>
+
+      <label for="categoria">Categoria:</label>
+      <input type="text" id="categoria" name="categoria" required>
+
+      <label for="tamanho">Tamanho:</label>
+      <input type="text" id="tamanho" name="tamanho">
+
+      <button type="submit" class="btn-azul">Salvar Alterações</button>
+      <button type="button" class="btn-azul-cancelar" onclick="fecharModalEditar()">Cancelar</button>
+    </form>
   </div>
 
   <script src="script.js"></script>
   <script>
-    // Função para renderizar os EPIs na tabela
-    function renderizarEpis() {
-      const tbody = document.querySelector('#tabelaEpis tbody');
-      if (!tbody) return;
+    // Função para preencher o formulário de edição com os dados do EPI
+    function carregarEpiParaEdicao(id) {
       const epis = carregarLocal('epis');
-      tbody.innerHTML = ''; // Limpa a tabela
+      const epi = epis.find(e => e.id === id);
 
-      epis.forEach(e => {
-        const dataFormatada = new Date(e.data).toLocaleString();
-        tbody.innerHTML += `
-          <tr>
-            <td>${e.id}</td>
-            <td>${e.nome}</td>
-            <td>${e.quantidade}</td>
-            <td>${e.categoria}</td>
-            <td>${e.tamanho || '-'}</td>
-            <td>${dataFormatada}</td>
-            <td>
-              <button onclick="editarEpi(${e.id})">Editar</button>
-              <button onclick="deletarEPI(${e.id})">EXCLUIR</button>
-            </td>
-          </tr>
-        `;
-      });
+      if (epi) {
+        // Preencher os campos do formulário com os dados do EPI
+        document.querySelector('#idEpi').value = epi.id;
+        document.querySelector('#nome').value = epi.nome;
+        document.querySelector('#quantidade').value = epi.quantidade;
+        document.querySelector('#categoria').value = epi.categoria;
+        document.querySelector('#tamanho').value = epi.tamanho || '';
+      } else {
+        alert('EPI não encontrado.');
+      }
     }
 
-    // Função para editar EPI - Redireciona para a página de edição
-    function editarEpi(id) {
-      window.location.href = `editar_epi.html?id=${id}`;
-    }
+    // Função para salvar as alterações feitas no EPI
+    function salvarEdicaoEPI(event) {
+      event.preventDefault(); // Evita o envio padrão do formulário
 
-    // Função para deletar EPI
-    function deletarEPI(id) {
-      let epis = carregarLocal('epis');
-      epis = epis.filter(e => e.id !== id);
-      salvarLocal('epis', epis);
-      renderizarEpis();
-    }
+      const form = event.target;
+      const idEpi = form.idEpi.value;
+      const nome = form.nome.value;
+      const quantidade = form.quantidade.value;
+      const categoria = form.categoria.value;
+      const tamanho = form.tamanho.value;
 
-    // Função para adicionar EPI ao estoque
-    function adicionarEPI(nome, quantidade, categoria, tamanho) {
       const epis = carregarLocal('epis');
-      const novo = {
-        id: Date.now(),
-        nome,
-        quantidade: parseInt(quantidade),
-        categoria,
-        tamanho: tamanho || '-',
-        data: new Date().toISOString()
-      };
-      epis.push(novo);
-      salvarLocal('epis', epis);
-      renderizarEpis();
+      const epiIndex = epis.findIndex(e => e.id == idEpi);
+
+      if (epiIndex !== -1) {
+        epis[epiIndex] = {
+          ...epis[epiIndex],
+          nome,
+          quantidade: parseInt(quantidade),
+          categoria,
+          tamanho
+        };
+        salvarLocal('epis', epis);
+        alert('EPI atualizado com sucesso!');
+        window.location.href = 'estoque.html'; // Redireciona de volta para a página de estoque
+      } else {
+        alert('Erro ao editar o EPI.');
+      }
     }
 
-    // Adicionar EPI através do formulário
+    // Função para fechar o modal de edição
+    function fecharModalEditar() {
+      window.location.href = 'estoque.html'; // Redireciona para a página de estoque sem salvar
+    }
+
+    // Carregar o EPI para edição ao carregar a página
     document.addEventListener('DOMContentLoaded', () => {
-      // Renderizar EPIs na página
-      renderizarEpis();
+      const urlParams = new URLSearchParams(window.location.search);
+      const epiId = parseInt(urlParams.get('id'));
 
-      // Formulário de Adicionar EPI
-      const formAdicionar = document.querySelector('#formAdicionar');
-      if (formAdicionar) {
-        formAdicionar.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const form = e.target;
-          adicionarEPI(form.nome.value, form.quantidade.value, form.categoria.value, form.tamanho.value);
-          form.reset();
-        });
+      if (epiId) {
+        carregarEpiParaEdicao(epiId);
+      } else {
+        alert('ID do EPI não fornecido.');
+        window.location.href = 'estoque.html'; // Redireciona caso o ID não tenha sido passado
       }
     });
   </script>
+
+  <style>
+    /* Estilos do formulário */
+    .form-container {
+      margin-top: 10px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 50px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .form-container input[type="submit"],
+    .form-container button {
+      width: 100%;
+      padding: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-container input[type="submit"]:hover,
+    .form-container button:hover {
+      background-color: #45a049;
+    }
+
+    .form-container input[type="text"],
+    .form-container input[type="number"],
+    .form-container textarea,
+    .form-container input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    /* Estilos dos botões */
+    .btn-azul {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 18px;
+    }
+
+    .btn-azul:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-azul-cancelar {
+      background-color: #dc3545;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 18px;
+    }
+
+    .btn-azul-cancelar:hover {
+      background-color: #c82333;
+    }
+  </style>
+
+</body>
+</html>
