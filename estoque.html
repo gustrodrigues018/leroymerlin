@@ -76,12 +76,6 @@
     localStorage.setItem(chave, JSON.stringify(valor));
   }
 
-  function excluirQuatroPrimeirosEPIs() {
-    let epis = carregarLocal('epis');
-    epis = epis.slice(4); // Remove os 4 primeiros
-    salvarLocal('epis', epis);
-  }
-
   function renderizarEstoque() {
     const tbody = document.querySelector('#tabelaEstoque tbody');
     const epis = carregarLocal('epis');
