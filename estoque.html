@@ -34,13 +34,14 @@
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
- <form id="formAdicionarEPI">
+  <form id="formAdicionarEPI">
     <input type="text" name="nome" placeholder="Nome do EPI" required />
     <input type="number" name="quantidade" placeholder="Quantidade" required />
     <input type="text" name="categoria" placeholder="Categoria do EPI" required />
     <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
     <button type="submit">Adicionar EPI</button>
   </form>
+
   <div class="centralizado">
     <input type="text" id="buscaNome" placeholder="Filtrar por Nome do EPI..." />
   </div>
@@ -109,6 +110,35 @@
     document.addEventListener('DOMContentLoaded', () => {
       renderizarEstoque();
 
+      // Adicionar EPI ao estoque
+      const form = document.querySelector('#formAdicionarEPI');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();  // Impede o envio do formulário
+
+        // Dados do novo EPI
+        const novoEpi = {
+          id: crypto.randomUUID(),  // Gera um ID único
+          nome: form.nome.value,
+          quantidade: parseInt(form.quantidade.value),
+          categoria: form.categoria.value,
+          tamanho: form.tamanho.value || ''  // Se não houver tamanho, deixa vazio
+        };
+
+        // Carrega os EPIs existentes do localStorage
+        const epis = carregarLocal('epis');
+        
+        // Adiciona o novo EPI ao array
+        epis.push(novoEpi);
+
+        // Salva novamente no localStorage
+        salvarLocal('epis', epis);
+
+        // Limpa o formulário e renderiza o estoque atualizado
+        form.reset();
+        renderizarEstoque();
+      });
+
+      // Filtro de busca
       document.querySelector('#buscaNome').addEventListener('input', function () {
         const filtro = this.value.toLowerCase();
         const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
@@ -121,4 +151,3 @@
   </script>
 </body>
 </html>
-
