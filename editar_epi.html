@@ -109,9 +109,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      renderizarEstoque();
+      renderizarEstoque(); // Apenas carrega os dados, sem excluir nada
 
-      // Adicionar novo EPI
       const form = document.querySelector('#formAdicionarEPI');
       form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -132,7 +131,6 @@
         renderizarEstoque();
       });
 
-      // Filtro de busca
       document.querySelector('#buscaNome').addEventListener('input', function () {
         const filtro = this.value.toLowerCase();
         const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
