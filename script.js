@@ -40,48 +40,6 @@ function deletarEPI(id) {
   renderizarEpis();
 }
 
-function editarEPI(id) {
-  const epis = carregarLocal('epis');
-  const epi = epis.find(e => e.id === id);
-  console.log(epi); // Verifique se os dados do EPI estão sendo encontrados
-  if (epi) {
-    // Preenche o modal com os dados do EPI
-    document.querySelector('#editNome').value = epi.nome;
-    document.querySelector('#editQuantidade').value = epi.quantidade;
-    document.querySelector('#editCategoria').value = epi.categoria;
-    document.querySelector('#editTamanho').value = epi.tamanho;
-
-    // Exibe o modal
-    const modalOverlay = document.querySelector('.modal-overlay');
-    modalOverlay.style.display = 'flex';  // Garante que o modal será exibido
-
-    // Ao salvar, atualiza os dados
-    document.querySelector('#saveEdit').onclick = () => {
-      const novoNome = document.querySelector('#editNome').value;
-      const novaQtd = document.querySelector('#editQuantidade').value;
-      const novaCat = document.querySelector('#editCategoria').value;
-      const novoTam = document.querySelector('#editTamanho').value;
-
-      if (novoNome && novaQtd) {
-        epi.nome = novoNome;
-        epi.quantidade = parseInt(novaQtd);
-        epi.categoria = novaCat;
-        epi.tamanho = novoTam;
-        salvarLocal('epis', epis);
-        renderizarEpis();
-        fecharModal();
-      }
-    };
-  } else {
-    console.log('EPI não encontrado!');
-  }
-}
-
-// Função para fechar o modal
-function fecharModal() {
-  document.querySelector('.modal-overlay').style.display = 'none'; // Oculta o modal
-}
-
 function renderizarEpis() {
   const tbody = document.querySelector('#tabelaEpis tbody');
   if (!tbody) return;
@@ -98,7 +56,6 @@ function renderizarEpis() {
         <td>${e.tamanho || '-'}</td>
         <td>${dataFormatada}</td>
         <td>
-          <button class="btn-editar" onclick="editarEPI(${e.id})">EDITAR</button>
           <button onclick="deletarEPI(${e.id})">EXCLUIR</button>
         </td>
       </tr>
@@ -157,29 +114,6 @@ function deletarRetirada(id) {
   }
 }
 
-function editarRetirada(id) {
-  const retiradas = carregarLocal('retiradas');
-  const retirada = retiradas.find(r => r.id === id);
-
-  if (retirada) {
-    const novoLdap = prompt("Nova matrícula:", retirada.ldap);
-    const novoNome = prompt("Novo nome do colaborador:", retirada.nome_colaborador);
-    const novoEpi = prompt("Novo nome do EPI:", retirada.nome_epi);
-    const novaQtd = parseInt(prompt("Nova quantidade:", retirada.quantidade));
-    const novoTam = prompt("Novo tamanho:", retirada.tamanho);
-
-    if (novoLdap && novoNome && novoEpi && novaQtd) {
-      retirada.ldap = novoLdap;
-      retirada.nome_colaborador = novoNome;
-      retirada.nome_epi = novoEpi;
-      retirada.quantidade = novaQtd;
-      retirada.tamanho = novoTam;
-      salvarLocal('retiradas', retiradas);
-      renderizarRetiradas();
-    }
-  }
-}
-
 // === Renderizar retiradas com filtro por LDAP ===
 function renderizarRetiradas(filtroLdap = '') {
   const tbody = document.querySelector('#tabelaRetiradas tbody');
@@ -200,7 +134,6 @@ function renderizarRetiradas(filtroLdap = '') {
         <td>${r.quantidade}</td>
         <td>${r.tamanho}</td>
         <td>
-          <button onclick="editarRetirada(${r.id})">EDITAR</button>
           <button onclick="deletarRetirada(${r.id})">EXCLUIR</button>
         </td>
       </tr>
@@ -254,11 +187,4 @@ document.addEventListener('DOMContentLoaded', () => {
       resetarEstoque();
     });
   }
-
-  // Fechar modal se clicar fora dele
-  document.querySelector('.modal-overlay').addEventListener('click', (e) => {
-    if (e.target === document.querySelector('.modal-overlay')) {
-      fecharModal();
-    }
-  });
 });
