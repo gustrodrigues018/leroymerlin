@@ -1,49 +1,38 @@
 // === Utilitários ===
-function salvarLocal(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+async function getEpis() {
+  const res = await fetch('/api/epis');
+  return await res.json();
 }
 
-function carregarLocal(key) {
-  return JSON.parse(localStorage.getItem(key)) || [];
-}
-
-function resetarRetiradas() {
-  localStorage.removeItem('retiradas');
-  renderizarRetiradas();
-}
-
-function resetarEstoque() {
-  localStorage.removeItem('epis');
-  renderizarEpis();
+async function getRetiradas() {
+  const res = await fetch('/api/retiradas');
+  return await res.json();
 }
 
 // === EPIs ===
-function adicionarEPI(nome, quantidade, categoria, tamanho) {
-  const epis = carregarLocal('epis');
-  const novo = {
-    id: Date.now(),
-    nome,
-    quantidade: parseInt(quantidade),
-    categoria,
-    tamanho: tamanho || '-',
-    data: new Date().toISOString()
-  };
-  epis.push(novo);
-  salvarLocal('epis', epis);
+async function adicionarEPI(nome, quantidade, categoria, tamanho) {
+  await fetch('/api/epis', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nome,
+      quantidade: parseInt(quantidade),
+      categoria,
+      tamanho: tamanho || '-'
+    })
+  });
   renderizarEpis();
 }
 
-function deletarEPI(id) {
-  let epis = carregarLocal('epis');
-  epis = epis.filter(e => e.id !== id);
-  salvarLocal('epis', epis);
+async function deletarEPI(id) {
+  await fetch(`/api/epis/${id}`, { method: 'DELETE' });
   renderizarEpis();
 }
 
-function renderizarEpis() {
+async function renderizarEpis() {
   const tbody = document.querySelector('#tabelaEpis tbody');
   if (!tbody) return;
-  const epis = carregarLocal('epis');
+  const epis = await getEpis();
   tbody.innerHTML = '';
   epis.forEach(e => {
     const dataFormatada = new Date(e.data).toLocaleString();
@@ -64,61 +53,39 @@ function renderizarEpis() {
 }
 
 // === Retiradas ===
-function registrarRetirada(ldap, nome_colaborador, nome_epi, quantidade, tamanho) {
-  const epis = carregarLocal('epis');
-  const epi = epis.find(e => e.nome === nome_epi && e.tamanho === tamanho);
+async function registrarRetirada(ldap, nome_colaborador, nome_epi, quantidade, tamanho) {
+  const res = await fetch('/api/retiradas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ldap,
+      nome_colaborador,
+      nome_epi,
+      quantidade: parseInt(quantidade),
+      tamanho: tamanho || '-'
+    })
+  });
 
-  if (epi) {
-    if (epi.quantidade >= quantidade) {
-      epi.quantidade -= parseInt(quantidade);
-      const retiradas = carregarLocal('retiradas');
-      const nova = {
-        id: Date.now(),
-        ldap,
-        nome_colaborador,
-        nome_epi,
-        quantidade: parseInt(quantidade),
-        tamanho: tamanho || '-',
-        data: new Date().toISOString()
-      };
-      retiradas.push(nova);
-      salvarLocal('retiradas', retiradas);
-      salvarLocal('epis', epis);
-      renderizarRetiradas();
-      renderizarEpis();
-    } else {
-      alert("QUANTIDADE INSUFICIENTE EM ESTOQUE PARA ESSA RETIRADA.");
-    }
+  if (res.ok) {
+    renderizarRetiradas();
+    renderizarEpis();
   } else {
-    alert("EPI NÃO ENCONTRADO NO ESTOQUE.");
+    const erro = await res.text();
+    alert(erro);
   }
 }
 
-function deletarRetirada(id) {
-  let retiradas = carregarLocal('retiradas');
-  const retirada = retiradas.find(r => r.id === id);
-
-  if (retirada) {
-    const epis = carregarLocal('epis');
-    const epi = epis.find(e => e.nome === retirada.nome_epi && e.tamanho === retirada.tamanho);
-
-    if (epi) {
-      epi.quantidade += retirada.quantidade;
-    }
-
-    retiradas = retiradas.filter(r => r.id !== id);
-    salvarLocal('retiradas', retiradas);
-    salvarLocal('epis', epis);
-    renderizarRetiradas();
-    renderizarEpis();
-  }
+async function deletarRetirada(id) {
+  await fetch(`/api/retiradas/${id}`, { method: 'DELETE' });
+  renderizarRetiradas();
+  renderizarEpis();
 }
 
 // === Renderizar retiradas com filtro por LDAP ===
-function renderizarRetiradas(filtroLdap = '') {
+async function renderizarRetiradas(filtroLdap = '') {
   const tbody = document.querySelector('#tabelaRetiradas tbody');
   if (!tbody) return;
-  const retiradas = carregarLocal('retiradas');
+  const retiradas = await getRetiradas();
   const retiradasFiltradas = retiradas.filter(r =>
     r.ldap.toLowerCase().includes(filtroLdap.toLowerCase())
   );
@@ -173,18 +140,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botões de reset
-  const botaoResetarRetiradas = document.querySelector('#resetarRetiradas');
-  if (botaoResetarRetiradas) {
-    botaoResetarRetiradas.addEventListener('click', () => {
-      resetarRetiradas();
-    });
-  }
-
-  const botaoResetarEstoque = document.querySelector('#resetarEstoque');
-  if (botaoResetarEstoque) {
-    botaoResetarEstoque.addEventListener('click', () => {
-      resetarEstoque();
-    });
-  }
+  // Os botões de reset estão obsoletos com MySQL, podem ser removidos
 });
