@@ -1,144 +1,169 @@
-// === Utilitários ===
-async function getEpis() {
-  const res = await fetch('/api/epis');
-  return await res.json();
+// Estoque
+let estoque = [];
+
+function carregarEstoque() {
+  const dados = localStorage.getItem("estoqueEPI");
+  estoque = dados ? JSON.parse(dados) : [];
 }
 
-async function getRetiradas() {
-  const res = await fetch('/api/retiradas');
-  return await res.json();
+function salvarEstoque() {
+  localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
 }
 
-// === EPIs ===
-async function adicionarEPI(nome, quantidade, categoria, tamanho) {
-  await fetch('/api/epis', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      nome,
-      quantidade: parseInt(quantidade),
-      categoria,
-      tamanho: tamanho || '-'
-    })
-  });
-  renderizarEpis();
-}
-
-async function deletarEPI(id) {
-  await fetch(`/api/epis/${id}`, { method: 'DELETE' });
-  renderizarEpis();
-}
-
-async function renderizarEpis() {
-  const tbody = document.querySelector('#tabelaEpis tbody');
-  if (!tbody) return;
-  const epis = await getEpis();
+function renderizarEstoque() {
+  const tbody = document.querySelector('#tabelaEstoque tbody');
   tbody.innerHTML = '';
-  epis.forEach(e => {
-    const dataFormatada = new Date(e.data).toLocaleString();
-    tbody.innerHTML += `
-      <tr>
-        <td>${e.id}</td>
-        <td>${e.nome}</td>
-        <td>${e.quantidade}</td>
-        <td>${e.categoria}</td>
-        <td>${e.tamanho || '-'}</td>
-        <td>${dataFormatada}</td>
-        <td>
-          <button onclick="deletarEPI(${e.id})">EXCLUIR</button>
-        </td>
-      </tr>
+
+  estoque.forEach((epi, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${epi.nome}</td>
+      <td>${epi.quantidade}</td>
+      <td>${epi.categoria}</td>
+      <td>${epi.tamanho || '-'}</td>
+      <td>
+        <button onclick="editarEpi(${index})">Editar</button>
+        <button onclick="removerEpi(${index})">Excluir</button>
+      </td>
     `;
+    tbody.appendChild(tr);
   });
 }
 
-// === Retiradas ===
-async function registrarRetirada(ldap, nome_colaborador, nome_epi, quantidade, tamanho) {
-  const res = await fetch('/api/retiradas', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      ldap,
-      nome_colaborador,
-      nome_epi,
-      quantidade: parseInt(quantidade),
-      tamanho: tamanho || '-'
-    })
-  });
-
-  if (res.ok) {
-    renderizarRetiradas();
-    renderizarEpis();
-  } else {
-    const erro = await res.text();
-    alert(erro);
-  }
-}
-
-async function deletarRetirada(id) {
-  await fetch(`/api/retiradas/${id}`, { method: 'DELETE' });
-  renderizarRetiradas();
-  renderizarEpis();
-}
-
-// === Renderizar retiradas com filtro por LDAP ===
-async function renderizarRetiradas(filtroLdap = '') {
-  const tbody = document.querySelector('#tabelaRetiradas tbody');
-  if (!tbody) return;
-  const retiradas = await getRetiradas();
-  const retiradasFiltradas = retiradas.filter(r =>
-    r.ldap.toLowerCase().includes(filtroLdap.toLowerCase())
+function adicionarOuSomarEPI(epi) {
+  const existente = estoque.find(e =>
+    e.nome === epi.nome &&
+    e.categoria === epi.categoria &&
+    e.tamanho === epi.tamanho
   );
+
+  if (existente) {
+    existente.quantidade += epi.quantidade;
+  } else {
+    estoque.push(epi);
+  }
+
+  salvarEstoque();
+  renderizarEstoque();
+}
+
+function removerEpi(index) {
+  estoque.splice(index, 1);
+  salvarEstoque();
+  renderizarEstoque();
+}
+
+function editarEpi(index) {
+  const epi = estoque[index];
+  const novoNome = prompt("Novo nome:", epi.nome);
+  if (novoNome === null) return;
+
+  const novaQuantidade = prompt("Nova quantidade:", epi.quantidade);
+  if (novaQuantidade === null) return;
+
+  const novaCategoria = prompt("Nova categoria:", epi.categoria);
+  if (novaCategoria === null) return;
+
+  const novoTamanho = prompt("Novo tamanho:", epi.tamanho);
+  if (novoTamanho === null) return;
+
+  epi.nome = novoNome;
+  epi.quantidade = parseInt(novaQuantidade);
+  epi.categoria = novaCategoria;
+  epi.tamanho = novoTamanho;
+
+  salvarEstoque();
+  renderizarEstoque();
+}
+
+// Retiradas
+let retiradas = [];
+
+function carregarRetiradas() {
+  const dados = localStorage.getItem("historicoRetirada");
+  retiradas = dados ? JSON.parse(dados) : [];
+}
+
+function salvarRetiradas() {
+  localStorage.setItem("historicoRetirada", JSON.stringify(retiradas));
+}
+
+function renderizarRetiradas() {
+  const tbody = document.querySelector('#tabelaRetiradas tbody');
   tbody.innerHTML = '';
-  retiradasFiltradas.forEach(r => {
-    const dataFormatada = new Date(r.data).toLocaleString();
-    tbody.innerHTML += `
-      <tr>
-        <td>${dataFormatada}</td>
-        <td>${r.ldap}</td>
-        <td>${r.nome_colaborador}</td>
-        <td>${r.nome_epi}</td>
-        <td>${r.quantidade}</td>
-        <td>${r.tamanho}</td>
-        <td>
-          <button onclick="deletarRetirada(${r.id})">EXCLUIR</button>
-        </td>
-      </tr>
+
+  retiradas.forEach((r, index) => {
+    const data = new Date(r.data).toLocaleString();
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${data}</td>
+      <td>${r.ldap}</td>
+      <td>${r.nome_colaborador}</td>
+      <td>${r.nome_epi}</td>
+      <td>${r.quantidade}</td>
+      <td>${r.tamanho || '-'}</td>
+      <td>
+        <button onclick="editarRetirada(${index})">Editar</button>
+        <button onclick="removerRetirada(${index})">Excluir</button>
+      </td>
     `;
+    tbody.appendChild(tr);
   });
 }
 
-// === Eventos ===
-document.addEventListener('DOMContentLoaded', () => {
-  // Formulário de Estoque
-  const formAdicionar = document.querySelector('#formAdicionar');
-  if (formAdicionar) {
-    renderizarEpis();
-    formAdicionar.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const form = e.target;
-      adicionarEPI(form.nome.value, form.quantidade.value, form.categoria.value, form.tamanho.value);
-      form.reset();
-    });
-  }
+function adicionarRetirada(retirada) {
+  retiradas.push(retirada);
+  salvarRetiradas();
+  renderizarRetiradas();
+}
 
-  // Formulário de Retiradas
-  const formRetirada = document.querySelector('#formRetirada');
-  if (formRetirada) {
-    renderizarRetiradas();
-    formRetirada.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const form = e.target;
-      registrarRetirada(
-        form.ldap.value,
-        form.nome_colaborador.value,
-        form.nome_epi.value,
-        form.quantidade.value,
-        form.tamanho.value
-      );
-      form.reset();
-    });
-  }
+function removerRetirada(index) {
+  retiradas.splice(index, 1);
+  salvarRetiradas();
+  renderizarRetiradas();
+}
 
-  // Os botões de reset estão obsoletos com MySQL, podem ser removidos
-});
+function editarRetirada(index) {
+  const r = retiradas[index];
+  const novoNome = prompt("Novo nome do colaborador:", r.nome_colaborador);
+  if (novoNome === null) return;
+
+  const novoEpi = prompt("Novo nome do EPI:", r.nome_epi);
+  if (novoEpi === null) return;
+
+  const novaQuantidade = prompt("Nova quantidade:", r.quantidade);
+  if (novaQuantidade === null) return;
+
+  const novoTamanho = prompt("Novo tamanho:", r.tamanho);
+  if (novoTamanho === null) return;
+
+  r.nome_colaborador = novoNome;
+  r.nome_epi = novoEpi;
+  r.quantidade = parseInt(novaQuantidade);
+  r.tamanho = novoTamanho;
+
+  salvarRetiradas();
+  renderizarRetiradas();
+}
+
+// Filtros
+function aplicarFiltroEstoque(valor) {
+  const filtro = valor.toLowerCase();
+  const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+  linhas.forEach(linha => {
+    const nome = linha.cells[0].textContent.toLowerCase();
+    const categoria = linha.cells[2].textContent.toLowerCase();
+    const tamanho = linha.cells[3].textContent.toLowerCase();
+    const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
+    linha.style.display = corresponde ? '' : 'none';
+  });
+}
+
+function aplicarFiltroRetiradas(valor) {
+  const filtro = valor.toLowerCase();
+  const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
+  linhas.forEach(linha => {
+    const matricula = linha.cells[1].textContent.toLowerCase();
+    linha.style.display = matricula.includes(filtro) ? '' : 'none';
+  });
+}
