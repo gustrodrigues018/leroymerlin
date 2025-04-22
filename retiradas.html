@@ -4,15 +4,12 @@
   <meta charset="UTF-8" />
   <title>Retirada de EPIs</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Estilos permanecem os mesmos */
-  </style>
 </head>
 <body>
   <h1>Retirada de EPIs</h1>
 
   <form id="formRetirada">
-    <input type="text" name="ldap" placeholder="Matricula do funcionário" required />
+    <input type="text" name="ldap" placeholder="Matrícula do funcionário" required />
     <input type="text" name="nome_colaborador" placeholder="Nome do funcionário" required />
     <input type="text" name="nome_epi" placeholder="Nome do EPI" required />
     <input type="number" name="quantidade" placeholder="Quantidade a retirar" required />
@@ -21,15 +18,16 @@
   </form>
 
   <h1>Histórico de Retirada</h1>
+
   <div class="centralizado">
-    <input type="text" id="buscaLdap" placeholder="Filtrar por Matricula..." />
+    <input type="text" id="buscaLdap" placeholder="Filtrar por Matrícula..." />
   </div>
 
   <table border="1" id="tabelaRetiradas">
     <thead>
       <tr>
         <th>Data</th>
-        <th>Matricula</th>
+        <th>Matrícula</th>
         <th>Colaborador</th>
         <th>Nome do EPI</th>
         <th>Quantidade</th>
@@ -48,50 +46,63 @@
   </div>
 
 <script>
-  // Função para buscar as retiradas do banco
-  async function carregarRetiradas() {
-    const response = await fetch('backend/listar_retiradas.php');
-    const dados = await response.json();
-    return dados;
+  let retiradas = [];
+
+  function carregarLocal() {
+    const dados = localStorage.getItem("historicoRetirada");
+    retiradas = dados ? JSON.parse(dados) : [];
   }
 
-  // Função para registrar uma retirada
-  async function registrarRetirada(retirada) {
-    await fetch('backend/registrar_retirada.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(retirada)
-    });
+  function salvarLocal() {
+    localStorage.setItem("historicoRetirada", JSON.stringify(retiradas));
   }
 
-  // Função para renderizar as retiradas na tabela
-  async function renderizarRetiradas() {
+  function renderizarRetiradas() {
     const tbody = document.querySelector('#tabelaRetiradas tbody');
-    const retiradas = await carregarRetiradas();
     tbody.innerHTML = '';
 
-    retiradas.forEach((r) => {
+    retiradas.forEach((r, index) => {
       const data = new Date(r.data).toLocaleString();
-      tbody.innerHTML += `
-        <tr>
-          <td>${data}</td>
-          <td>${r.ldap}</td>
-          <td>${r.nome_colaborador}</td>
-          <td>${r.nome_epi}</td>
-          <td>${r.quantidade}</td>
-          <td>${r.tamanho || '-'}</td>
-          <td>
-            <button class="btn-azul" onclick="editarRetirada('${r.id}')">Editar</button>
-            <button class="btn-vermelho" onclick="deletarRetirada('${r.id}')">Excluir</button>
-          </td>
-        </tr>
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${data}</td>
+        <td>${r.ldap}</td>
+        <td>${r.nome_colaborador}</td>
+        <td>${r.nome_epi}</td>
+        <td>${r.quantidade}</td>
+        <td>${r.tamanho || '-'}</td>
+        <td>
+          <button onclick="editarRetirada(${index})">Editar</button>
+          <button onclick="removerRetirada(${index})">Excluir</button>
+        </td>
       `;
+      tbody.appendChild(tr);
     });
   }
 
-  // Filtro de busca por matrícula
+  function adicionarRetirada(retirada) {
+    retiradas.push(retirada);
+    salvarLocal();
+    renderizarRetiradas();
+  }
+
+  document.querySelector('#formRetirada').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const retirada = {
+      id: crypto.randomUUID(),
+      data: new Date().toISOString(),
+      ldap: this.ldap.value.trim(),
+      nome_colaborador: this.nome_colaborador.value.trim(),
+      nome_epi: this.nome_epi.value.trim(),
+      quantidade: parseInt(this.quantidade.value),
+      tamanho: this.tamanho.value.trim() || '-'
+    };
+
+    adicionarRetirada(retirada);
+    this.reset();
+  });
+
   document.querySelector('#buscaLdap').addEventListener('input', function () {
     const filtro = this.value.toLowerCase();
     const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
@@ -101,31 +112,40 @@
     });
   });
 
-  // Evento de carregamento da página
-  document.addEventListener('DOMContentLoaded', () => {
+  function removerRetirada(index) {
+    retiradas.splice(index, 1);
+    salvarLocal();
     renderizarRetiradas();
+  }
 
-    const form = document.querySelector('#formRetirada');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+  function editarRetirada(index) {
+    const r = retiradas[index];
+    const novoNome = prompt("Novo nome do colaborador:", r.nome_colaborador);
+    if (novoNome === null) return;
 
-      const nova = {
-        id: crypto.randomUUID(),
-        data: new Date().toISOString(),
-        ldap: form.ldap.value,
-        nome_colaborador: form.nome_colaborador.value,
-        nome_epi: form.nome_epi.value,
-        quantidade: parseInt(form.quantidade.value),
-        tamanho: form.tamanho.value
-      };
+    const novoEpi = prompt("Novo nome do EPI:", r.nome_epi);
+    if (novoEpi === null) return;
 
-      registrarRetirada(nova);
-      form.reset();
-      renderizarRetiradas();
-    });
-  });
+    const novaQuantidade = prompt("Nova quantidade:", r.quantidade);
+    if (novaQuantidade === null) return;
+
+    const novoTamanho = prompt("Novo tamanho:", r.tamanho);
+    if (novoTamanho === null) return;
+
+    r.nome_colaborador = novoNome;
+    r.nome_epi = novoEpi;
+    r.quantidade = parseInt(novaQuantidade);
+    r.tamanho = novoTamanho;
+
+    salvarLocal();
+    renderizarRetiradas();
+  }
+
+  window.onload = () => {
+    carregarLocal();
+    renderizarRetiradas();
+  };
 </script>
 
 </body>
 </html>
-
