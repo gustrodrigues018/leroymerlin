@@ -39,7 +39,12 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Populado via JS -->
+<?php
+$pdo = new PDO("mysql:host=localhost;dbname=leroycotroll", "usuario", "senha");
+$stmt = $pdo->query("SELECT * FROM epis");
+$dados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+echo json_encode($dados);
+?>
     </tbody>
   </table>
 
