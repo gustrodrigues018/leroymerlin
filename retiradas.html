@@ -47,105 +47,78 @@
 
 <script>
   let retiradas = [];
+  let estoque = [];
 
   function carregarLocal() {
-    const dados = localStorage.getItem("historicoRetirada");
-    retiradas = dados ? JSON.parse(dados) : [];
+    const dadosRetiradas = localStorage.getItem("retiradasEPI");
+    const dadosEstoque = localStorage.getItem("estoqueEPI");
+    retiradas = dadosRetiradas ? JSON.parse(dadosRetiradas) : [];
+    estoque = dadosEstoque ? JSON.parse(dadosEstoque) : [];
   }
 
   function salvarLocal() {
-    localStorage.setItem("historicoRetirada", JSON.stringify(retiradas));
+    localStorage.setItem("retiradasEPI", JSON.stringify(retiradas));
+    localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
   }
 
   function renderizarRetiradas() {
     const tbody = document.querySelector('#tabelaRetiradas tbody');
     tbody.innerHTML = '';
 
-    retiradas.forEach((r, index) => {
-      const data = new Date(r.data).toLocaleString();
+    retiradas.forEach((retirada, index) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${data}</td>
-        <td>${r.ldap}</td>
-        <td>${r.nome_colaborador}</td>
-        <td>${r.nome_epi}</td>
-        <td>${r.quantidade}</td>
-        <td>${r.tamanho || '-'}</td>
-        <td>
-          <button onclick="editarRetirada(${index})">Editar</button>
-          <button onclick="removerRetirada(${index})">Excluir</button>
-        </td>
+        <td>${retirada.nomeFuncionario}</td>
+        <td>${retirada.nomeEPI}</td>
+        <td>${retirada.quantidade}</td>
+        <td>${retirada.data}</td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  function adicionarRetirada(retirada) {
+  document.querySelector('#formRetiradaEPI').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const nomeFuncionario = this.nomeFuncionario.value.trim();
+    const nomeEPI = this.nomeEPI.value.trim();
+    const quantidade = parseInt(this.quantidade.value);
+
+    // Busca o EPI correspondente no estoque
+    const epiEstoque = estoque.find(e => e.nome === nomeEPI);
+
+    if (!epiEstoque) {
+      alert("EPI não encontrado no estoque.");
+      return;
+    }
+
+    if (epiEstoque.quantidade < quantidade) {
+      alert("Quantidade insuficiente no estoque.");
+      return;
+    }
+
+    // Realiza a retirada e atualiza o estoque
+    epiEstoque.quantidade -= quantidade;
+
+    const retirada = {
+      nomeFuncionario,
+      nomeEPI,
+      quantidade,
+      data: new Date().toLocaleDateString("pt-BR")
+    };
+
     retiradas.push(retirada);
     salvarLocal();
     renderizarRetiradas();
-  }
-
-  document.querySelector('#formRetirada').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const retirada = {
-      id: crypto.randomUUID(),
-      data: new Date().toISOString(),
-      ldap: this.ldap.value.trim(),
-      nome_colaborador: this.nome_colaborador.value.trim(),
-      nome_epi: this.nome_epi.value.trim(),
-      quantidade: parseInt(this.quantidade.value),
-      tamanho: this.tamanho.value.trim() || '-'
-    };
-
-    adicionarRetirada(retirada);
     this.reset();
   });
-
-  document.querySelector('#buscaLdap').addEventListener('input', function () {
-    const filtro = this.value.toLowerCase();
-    const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
-    linhas.forEach(linha => {
-      const matricula = linha.cells[1].textContent.toLowerCase();
-      linha.style.display = matricula.includes(filtro) ? '' : 'none';
-    });
-  });
-
-  function removerRetirada(index) {
-    retiradas.splice(index, 1);
-    salvarLocal();
-    renderizarRetiradas();
-  }
-
-  function editarRetirada(index) {
-    const r = retiradas[index];
-    const novoNome = prompt("Novo nome do colaborador:", r.nome_colaborador);
-    if (novoNome === null) return;
-
-    const novoEpi = prompt("Novo nome do EPI:", r.nome_epi);
-    if (novoEpi === null) return;
-
-    const novaQuantidade = prompt("Nova quantidade:", r.quantidade);
-    if (novaQuantidade === null) return;
-
-    const novoTamanho = prompt("Novo tamanho:", r.tamanho);
-    if (novoTamanho === null) return;
-
-    r.nome_colaborador = novoNome;
-    r.nome_epi = novoEpi;
-    r.quantidade = parseInt(novaQuantidade);
-    r.tamanho = novoTamanho;
-
-    salvarLocal();
-    renderizarRetiradas();
-  }
 
   window.onload = () => {
     carregarLocal();
     renderizarRetiradas();
   };
 </script>
+
 
 </body>
 </html>
