@@ -40,96 +40,99 @@
     </tbody>
   </table>
 
-  <script>
-    let estoque = [];
+  <!-- MESMO HTML ACIMA, COM ESSA ALTERAÇÃO NO JS -->
+<script>
+  let estoque = [];
 
-    function carregarLocal() {
-      const dados = localStorage.getItem("estoqueEPI");
-      estoque = dados ? JSON.parse(dados) : [];
-    }
+  function carregarLocal() {
+    const dados = localStorage.getItem("estoqueEPI");
+    estoque = dados ? JSON.parse(dados) : [];
+  }
 
-    function salvarLocal() {
-      localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
-    }
+  function salvarLocal() {
+    localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
+  }
 
-    function renderizarEstoque() {
-      const tbody = document.querySelector('#tabelaEstoque tbody');
-      tbody.innerHTML = '';
+  function renderizarEstoque() {
+    const tbody = document.querySelector('#tabelaEstoque tbody');
+    tbody.innerHTML = '';
 
-      estoque.forEach((epi, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${epi.nome}</td>
-          <td>${epi.quantidade}</td>
-          <td>${epi.categoria}</td>
-          <td>${epi.tamanho || '-'}</td>
-          <td>
-            <button onclick="redirecionarParaEdicao(${index})">Editar</button>
-            <button onclick="removerEpi(${index})">Excluir</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function adicionarOuSomarEPI(epi) {
-      const existente = estoque.find(e =>
-        e.nome === epi.nome &&
-        e.categoria === epi.categoria &&
-        e.tamanho === epi.tamanho
-      );
-
-      if (existente) {
-        existente.quantidade += epi.quantidade;
-      } else {
-        estoque.push(epi);
-      }
-
-      salvarLocal();
-      renderizarEstoque();
-    }
-
-    document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const epi = {
-        nome: this.nome.value.trim(),
-        quantidade: parseInt(this.quantidade.value),
-        categoria: this.categoria.value.trim(),
-        tamanho: this.tamanho.value.trim() || '-'
-      };
-
-      adicionarOuSomarEPI(epi);
-      this.reset();
+    estoque.forEach((epi, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${epi.nome}</td>
+        <td>${epi.quantidade}</td>
+        <td>${epi.categoria}</td>
+        <td>${epi.tamanho || '-'}</td>
+        <td>
+          <button onclick="redirecionarParaEdicao(${index})">Editar</button>
+          <button onclick="removerEpi(${index})">Excluir</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
     });
+  }
 
-    document.querySelector('#buscaNome').addEventListener('input', function () {
-      const filtro = this.value.toLowerCase();
-      const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-      linhas.forEach(linha => {
-        const nome = linha.cells[0].textContent.toLowerCase();
-        const categoria = linha.cells[2].textContent.toLowerCase();
-        const tamanho = linha.cells[3].textContent.toLowerCase();
-        const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
-        linha.style.display = corresponde ? '' : 'none';
-      });
-    });
+  function adicionarOuSomarEPI(epi) {
+    const existente = estoque.find(e =>
+      e.nome === epi.nome &&
+      e.categoria === epi.categoria &&
+      e.tamanho === epi.tamanho
+    );
 
-    function removerEpi(index) {
-      estoque.splice(index, 1);
-      salvarLocal();
-      renderizarEstoque();
+    if (existente) {
+      existente.quantidade += epi.quantidade;
+    } else {
+      epi.id = Date.now(); // GERA UM ID ÚNICO
+      estoque.push(epi);
     }
 
-    function redirecionarParaEdicao(index) {
-      localStorage.setItem("epiParaEditar", JSON.stringify({ index, ...estoque[index] }));
-      window.location.href = "editar_epi.html";
-    }
+    salvarLocal();
+    renderizarEstoque();
+  }
 
-    window.onload = () => {
-      carregarLocal();
-      renderizarEstoque();
+  document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const epi = {
+      nome: this.nome.value.trim(),
+      quantidade: parseInt(this.quantidade.value),
+      categoria: this.categoria.value.trim(),
+      tamanho: this.tamanho.value.trim() || '-'
     };
-  </script>
+
+    adicionarOuSomarEPI(epi);
+    this.reset();
+  });
+
+  document.querySelector('#buscaNome').addEventListener('input', function () {
+    const filtro = this.value.toLowerCase();
+    const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+    linhas.forEach(linha => {
+      const nome = linha.cells[0].textContent.toLowerCase();
+      const categoria = linha.cells[2].textContent.toLowerCase();
+      const tamanho = linha.cells[3].textContent.toLowerCase();
+      const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
+      linha.style.display = corresponde ? '' : 'none';
+    });
+  });
+
+  function removerEpi(index) {
+    estoque.splice(index, 1);
+    salvarLocal();
+    renderizarEstoque();
+  }
+
+  function redirecionarParaEdicao(index) {
+    localStorage.setItem("epiParaEditar", JSON.stringify({ index, ...estoque[index] }));
+    window.location.href = "editar_epi.html";
+  }
+
+  window.onload = () => {
+    carregarLocal();
+    renderizarEstoque();
+  };
+</script>
+
 </body>
 </html>
