@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <title>Estoque de EPIs</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Estilos permanecem os mesmos */
-  </style>
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
@@ -39,64 +36,73 @@
       </tr>
     </thead>
     <tbody>
-<?php
-$pdo = new PDO("mysql:host=localhost;dbname=leroycotroll", "usuario", "senha");
-$stmt = $pdo->query("SELECT * FROM epis");
-$dados = $stmt->fetchAll(PDO::FETCH_ASSOC);
-echo json_encode($dados);
-?>
+      <!-- Populado via JS -->
     </tbody>
   </table>
 
 <script>
-  // Função para buscar os EPIs do banco
-  async function carregarEstoque() {
-    const response = await fetch('backend/listar_estoque.php');
-    const dados = await response.json();
-    return dados;
+  let estoque = [];
+
+  function carregarLocal() {
+    const dados = localStorage.getItem("estoqueEPI");
+    estoque = dados ? JSON.parse(dados) : [];
   }
 
-  // Função para adicionar ou somar EPI no banco
-  async function adicionarOuSomarEPI(nome, quantidade, categoria, tamanho) {
-    const epi = {
-      nome: nome.trim(),
-      quantidade,
-      categoria: categoria.trim(),
-      tamanho: tamanho.trim() || '-'
-    };
-
-    await fetch('backend/adicionar_epi.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(epi)
-    });
+  function salvarLocal() {
+    localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
   }
 
-  // Função para renderizar os EPIs na tabela
-  async function renderizarEstoque() {
+  function renderizarEstoque() {
     const tbody = document.querySelector('#tabelaEstoque tbody');
-    const epis = await carregarEstoque();
     tbody.innerHTML = '';
 
-    epis.forEach((epi) => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${epi.nome}</td>
-          <td>${epi.quantidade}</td>
-          <td>${epi.categoria}</td>
-          <td>${epi.tamanho || '-'}</td>
-          <td>
-            <button class="btn-azul" onclick="editarEpi('${epi.id}')">Editar</button>
-            <button class="btn-vermelho" onclick="deletarEpi('${epi.id}')">Excluir</button>
-          </td>
-        </tr>
+    estoque.forEach((epi, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${epi.nome}</td>
+        <td>${epi.quantidade}</td>
+        <td>${epi.categoria}</td>
+        <td>${epi.tamanho || '-'}</td>
+        <td>
+          <button onclick="editarEpi(${index})">Editar</button>
+          <button onclick="removerEpi(${index})">Excluir</button>
+        </td>
       `;
+      tbody.appendChild(tr);
     });
   }
 
-  // Função de filtro de busca
+  function adicionarOuSomarEPI(epi) {
+    const existente = estoque.find(e =>
+      e.nome === epi.nome &&
+      e.categoria === epi.categoria &&
+      e.tamanho === epi.tamanho
+    );
+
+    if (existente) {
+      existente.quantidade += epi.quantidade;
+    } else {
+      estoque.push(epi);
+    }
+
+    salvarLocal();
+    renderizarEstoque();
+  }
+
+  document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const epi = {
+      nome: this.nome.value.trim(),
+      quantidade: parseInt(this.quantidade.value),
+      categoria: this.categoria.value.trim(),
+      tamanho: this.tamanho.value.trim() || '-'
+    };
+
+    adicionarOuSomarEPI(epi);
+    this.reset();
+  });
+
   document.querySelector('#buscaNome').addEventListener('input', function () {
     const filtro = this.value.toLowerCase();
     const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
@@ -109,27 +115,40 @@ echo json_encode($dados);
     });
   });
 
-  // Evento de carregamento da página
-  document.addEventListener('DOMContentLoaded', () => {
+  function removerEpi(index) {
+    estoque.splice(index, 1);
+    salvarLocal();
     renderizarEstoque();
+  }
 
-    const form = document.querySelector('#formAdicionarEPI');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+  function editarEpi(index) {
+    const epi = estoque[index];
+    const novoNome = prompt("Novo nome:", epi.nome);
+    if (novoNome === null) return;
 
-      const nome = form.nome.value;
-      const quantidade = parseInt(form.quantidade.value);
-      const categoria = form.categoria.value;
-      const tamanho = form.tamanho.value;
+    const novaQuantidade = prompt("Nova quantidade:", epi.quantidade);
+    if (novaQuantidade === null) return;
 
-      adicionarOuSomarEPI(nome, quantidade, categoria, tamanho);
-      form.reset();
-      renderizarEstoque();
-    });
-  });
+    const novaCategoria = prompt("Nova categoria:", epi.categoria);
+    if (novaCategoria === null) return;
+
+    const novoTamanho = prompt("Novo tamanho:", epi.tamanho);
+    if (novoTamanho === null) return;
+
+    epi.nome = novoNome;
+    epi.quantidade = parseInt(novaQuantidade);
+    epi.categoria = novaCategoria;
+    epi.tamanho = novoTamanho;
+
+    salvarLocal();
+    renderizarEstoque();
+  }
+
+  window.onload = () => {
+    carregarLocal();
+    renderizarEstoque();
+  };
 </script>
 
 </body>
 </html>
-
-
