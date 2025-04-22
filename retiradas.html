@@ -68,28 +68,44 @@
     retiradas.forEach((retirada, index) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
+        <td>${retirada.data}</td>
+        <td>${retirada.ldap}</td>
         <td>${retirada.nomeFuncionario}</td>
         <td>${retirada.nomeEPI}</td>
         <td>${retirada.quantidade}</td>
-        <td>${retirada.data}</td>
+        <td>${retirada.tamanho || '-'}</td>
+        <td><button onclick="removerRetirada(${index})">Excluir</button></td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  document.querySelector('#formRetiradaEPI').addEventListener('submit', function (e) {
+  function removerRetirada(index) {
+    const retirada = retiradas[index];
+    const itemEstoque = estoque.find(e => e.nome === retirada.nomeEPI && (e.tamanho || '-') === retirada.tamanho);
+    if (itemEstoque) {
+      itemEstoque.quantidade += retirada.quantidade;
+    }
+
+    retiradas.splice(index, 1);
+    salvarLocal();
+    renderizarRetiradas();
+  }
+
+  document.querySelector('#formRetirada').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const nomeFuncionario = this.nomeFuncionario.value.trim();
-    const nomeEPI = this.nomeEPI.value.trim();
+    const ldap = this.ldap.value.trim();
+    const nomeFuncionario = this.nome_colaborador.value.trim();
+    const nomeEPI = this.nome_epi.value.trim();
     const quantidade = parseInt(this.quantidade.value);
+    const tamanho = this.tamanho.value.trim() || '-';
 
-    // Busca o EPI correspondente no estoque
-    const epiEstoque = estoque.find(e => e.nome === nomeEPI);
+    let epiEstoque = estoque.find(e => e.nome === nomeEPI && (e.tamanho || '-') === tamanho);
 
     if (!epiEstoque) {
-      alert("EPI não encontrado no estoque.");
-      return;
+      epiEstoque = { nome: nomeEPI, tamanho, quantidade: 0 };
+      estoque.push(epiEstoque);
     }
 
     if (epiEstoque.quantidade < quantidade) {
@@ -97,13 +113,14 @@
       return;
     }
 
-    // Realiza a retirada e atualiza o estoque
     epiEstoque.quantidade -= quantidade;
 
     const retirada = {
+      ldap,
       nomeFuncionario,
       nomeEPI,
       quantidade,
+      tamanho,
       data: new Date().toLocaleDateString("pt-BR")
     };
 
@@ -113,12 +130,20 @@
     this.reset();
   });
 
+  document.querySelector('#buscaLdap').addEventListener('input', function () {
+    const filtro = this.value.toLowerCase();
+    const linhas = document.querySelectorAll('#tabelaRetiradas tbody tr');
+    linhas.forEach(linha => {
+      const ldap = linha.cells[1].textContent.toLowerCase();
+      linha.style.display = ldap.includes(filtro) ? '' : 'none';
+    });
+  });
+
   window.onload = () => {
     carregarLocal();
     renderizarRetiradas();
   };
 </script>
-
 
 </body>
 </html>
