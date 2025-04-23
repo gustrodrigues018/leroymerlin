@@ -32,7 +32,7 @@
   </div>
 
 <script>
-  function gerarId(epi) {
+  function gerarIdEPI(epi) {
     return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
   }
 
@@ -75,22 +75,20 @@
       nome,
       quantidade,
       categoria,
-      tamanho,
+      tamanho
     };
 
-    const novoId = gerarId(novoEpi);
+    const novoId = gerarIdEPI(novoEpi);
     novoEpi.id = novoId;
 
     let epis = carregarLocal();
 
-    // Verifica se o ID foi alterado e se já existe outro com o novo ID
     const existeOutro = epis.find(e => e.id === novoId && e.id !== idAntigo);
     if (existeOutro) {
       alert('Já existe um EPI com essas especificações. Altere os campos para evitar duplicidade.');
       return;
     }
 
-    // Atualiza ou substitui o EPI
     epis = epis.map(epi => epi.id === idAntigo ? novoEpi : epi);
 
     salvarLocal(epis);
@@ -108,59 +106,61 @@
       window.location.href = 'estoque.html';
     }
   });
+
+  function fecharModalEditar() {
+    window.location.href = 'estoque.html';
+  }
 </script>
 
+<style>
+  .form-container {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 50px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+  }
 
+  .form-container input,
+  .form-container button {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
 
-  <style>
-    .form-container {
-      margin-top: 10px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 50px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 700px;
-      text-align: center;
-    }
+  .form-container button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+  }
 
-    .form-container input,
-    .form-container button {
-      width: 100%;
-      padding: 16px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
-    }
+  .form-container button:hover {
+    background-color: #45a049;
+  }
 
-    .form-container button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      transition: background-color 0.3s ease;
-      cursor: pointer;
-    }
+  h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
 
-    .form-container button:hover {
-      background-color: #45a049;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-      text-align: left;
-    }
-  </style>
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-align: left;
+  }
+</style>
 
 </body>
 </html>
