@@ -44,6 +44,10 @@
 <script>
   let estoque = [];
 
+  function gerarIdEPI(epi) {
+    return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
+  }
+
   function carregarLocal() {
     const dados = localStorage.getItem("estoqueEPI");
     estoque = dados ? JSON.parse(dados) : [];
@@ -74,16 +78,13 @@
   }
 
   function adicionarOuSomarEPI(epi) {
-    const existente = estoque.find(e =>
-      e.nome === epi.nome &&
-      e.categoria === epi.categoria &&
-      e.tamanho === epi.tamanho
-    );
+    epi.id = gerarIdEPI(epi); // ID único com base nas propriedades
+
+    const existente = estoque.find(e => e.id === epi.id);
 
     if (existente) {
       existente.quantidade += epi.quantidade;
     } else {
-      epi.id = Date.now(); // GERA UM ID ÚNICO
       estoque.push(epi);
     }
 
