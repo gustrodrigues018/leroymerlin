@@ -32,75 +32,89 @@
   </div>
 
   <script>
-    function carregarLocal(chave) {
-      return JSON.parse(localStorage.getItem(chave)) || [];
-    }
+  function gerarId(item) {
+    return `${item.nome.toLowerCase()}-${item.categoria.toLowerCase()}-${(item.tamanho || '').toLowerCase()}`;
+  }
 
-    function salvarLocal(chave, valor) {
-      localStorage.setItem(chave, JSON.stringify(valor));
-    }
+  function carregarLocal(chave) {
+    return JSON.parse(localStorage.getItem(chave)) || [];
+  }
 
-    function carregarEPIParaEdicao(id) {
-      const epis = carregarLocal('epis');
-      const epi = epis.find(e => e.id === id);
+  function salvarLocal(chave, valor) {
+    localStorage.setItem(chave, JSON.stringify(valor));
+  }
 
-      if (epi) {
-        document.querySelector('#idEPI').value = epi.id;
-        document.querySelector('#nome').value = epi.nome;
-        document.querySelector('#quantidade').value = epi.quantidade;
-        document.querySelector('#categoria').value = epi.categoria;
-        document.querySelector('#tamanho').value = epi.tamanho || '';
-      } else {
-        alert('EPI não encontrado.');
-        window.location.href = 'index.html';
-      }
-    }
+  function carregarEPIParaEdicao(id) {
+    const epis = carregarLocal('epis');
+    const epi = epis.find(e => e.id === id);
 
-    function salvarEdicaoEPI(event) {
-      event.preventDefault();
-
-      const form = event.target;
-      const id = form.idEPI.value;
-      const nome = form.nome.value;
-      const quantidade = parseInt(form.quantidade.value);
-      const categoria = form.categoria.value;
-      const tamanho = form.tamanho.value;
-
-      const epis = carregarLocal('epis');
-      const index = epis.findIndex(e => e.id === id);
-
-      if (index !== -1) {
-        epis[index] = {
-          ...epis[index],
-          nome,
-          quantidade,
-          categoria,
-          tamanho
-        };
-        salvarLocal('epis', epis);
-        alert('EPI atualizado com sucesso!');
-        window.location.href = 'estoque.html';
-      } else {
-        alert('Erro ao editar o EPI.');
-      }
-    }
-
-    function fecharModalEditar() {
+    if (epi) {
+      document.querySelector('#idEPI').value = epi.id;
+      document.querySelector('#nome').value = epi.nome;
+      document.querySelector('#quantidade').value = epi.quantidade;
+      document.querySelector('#categoria').value = epi.categoria;
+      document.querySelector('#tamanho').value = epi.tamanho || '';
+    } else {
+      alert('EPI não encontrado.');
       window.location.href = 'index.html';
     }
+  }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+  function salvarEdicaoEPI(event) {
+    event.preventDefault();
 
-      if (id) {
-        carregarEPIParaEdicao(id);
-      } else {
-        alert('ID do EPI não fornecido.');
-        window.location.href = 'index.html';
+    const form = event.target;
+    const nome = form.nome.value;
+    const quantidade = parseInt(form.quantidade.value);
+    const categoria = form.categoria.value;
+    const tamanho = form.tamanho.value;
+    const novoId = gerarId({ nome, categoria, tamanho });
+
+    const epis = carregarLocal('epis');
+    const idAntigo = form.idEPI.value;
+    const index = epis.findIndex(e => e.id === idAntigo);
+
+    if (index !== -1) {
+      // Verifica se o novo ID já existe com outro EPI
+      const conflito = epis.find(e => e.id === novoId && e.id !== idAntigo);
+      if (conflito) {
+        alert('Já existe um EPI com esses dados. Por favor, edite de forma que não haja duplicação.');
+        return;
       }
-    });
-  </script>
+
+      epis[index] = {
+        id: novoId,
+        nome,
+        quantidade,
+        categoria,
+        tamanho
+      };
+
+      salvarLocal('epis', epis);
+      alert('EPI atualizado com sucesso!');
+      window.location.href = 'estoque.html';
+    } else {
+      alert('Erro ao editar o EPI.');
+    }
+  }
+
+  function fecharModalEditar() {
+    window.location.href = 'index.html';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    if (id) {
+      carregarEPIParaEdicao(id);
+    } else {
+      alert('ID do EPI não fornecido.');
+      window.location.href = 'index.html';
+    }
+  });
+</script>
+
 
   <style>
     .form-container {
