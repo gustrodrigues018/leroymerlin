@@ -25,6 +25,10 @@
     <a href="retiradas.html"><button>Ir para Retiradas</button></a>
   </div>
 
+  <div style="text-align:center; margin: 20px;">
+    <button onclick="excluirTodosEPIs()">Excluir Todos os EPIs</button>
+  </div>
+
   <table border="1" id="tabelaEstoque">
     <thead>
       <tr>
@@ -77,7 +81,7 @@
   }
 
   function adicionarOuSomarEPI(epi) {
-    epi.id = gerarIdEPI(epi); // ID único com base nas propriedades
+    epi.id = gerarIdEPI(epi);
 
     const existente = estoque.find(e => e.id === epi.id);
 
@@ -127,6 +131,17 @@
     window.location.href = `editar_epi.html?id=${encodeURIComponent(id)}`;
   }
 
+  // Função para excluir todos os EPIs
+  function excluirTodosEPIs() {
+    const confirmacao = confirm("Tem certeza que deseja excluir todos os EPIs?");
+    if (confirmacao) {
+      localStorage.removeItem('estoqueEPI');
+      estoque = [];
+      renderizarEstoque();
+      alert("Todos os EPIs foram excluídos com sucesso.");
+    }
+  }
+
   window.onload = () => {
     carregarLocal();
     renderizarEstoque();
@@ -135,6 +150,7 @@
 
 </body>
 </html>
+
 </script>
 
 </body>
