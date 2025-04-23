@@ -40,7 +40,6 @@
     </tbody>
   </table>
 
-  <!-- MESMO HTML ACIMA, COM ESSA ALTERAÇÃO NO JS -->
 <script>
   let estoque = [];
 
@@ -61,7 +60,7 @@
     const tbody = document.querySelector('#tabelaEstoque tbody');
     tbody.innerHTML = '';
 
-    estoque.forEach((epi, index) => {
+    estoque.forEach(epi => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${epi.nome}</td>
@@ -69,8 +68,8 @@
         <td>${epi.categoria}</td>
         <td>${epi.tamanho || '-'}</td>
         <td>
-          <button onclick="redirecionarParaEdicao(${index})">Editar</button>
-          <button onclick="removerEpi(${index})">Excluir</button>
+          <button onclick="redirecionarParaEdicao('${epi.id}')">Editar</button>
+          <button onclick="removerEpi('${epi.id}')">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -118,15 +117,14 @@
     });
   });
 
-  function removerEpi(index) {
-    estoque.splice(index, 1);
+  function removerEpi(id) {
+    estoque = estoque.filter(epi => epi.id !== id);
     salvarLocal();
     renderizarEstoque();
   }
 
-  function redirecionarParaEdicao(index) {
-    localStorage.setItem("epiParaEditar", JSON.stringify({ index, ...estoque[index] }));
-    window.location.href = "editar_epi.html";
+  function redirecionarParaEdicao(id) {
+    window.location.href = `editar_epi.html?id=${encodeURIComponent(id)}`;
   }
 
   window.onload = () => {
