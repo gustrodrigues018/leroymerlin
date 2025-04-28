@@ -30,6 +30,26 @@ function renderizarEstoque() {
   });
 }
 
+async function enviarEpiParaGoogleSheets(epi) {
+  const url = 'https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbwlP_ymtYxVoafaW8Ca7vF2h0473uLeEV9czNpttLOSt42fqDGOEjUs3HqJwo9pdGIXQA/exec';
+  
+  try {
+    const resposta = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(epi),
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (resposta.ok) {
+      console.log('EPI enviado para o Google Sheets com sucesso!');
+    } else {
+      console.error('Falha ao enviar para o Google Sheets.');
+    }
+  } catch (error) {
+    console.error('Erro de conexão com o Google Sheets:', error);
+  }
+}
+
 function adicionarOuSomarEPI(epi) {
   const existente = estoque.find(e =>
     e.nome === epi.nome &&
@@ -45,6 +65,9 @@ function adicionarOuSomarEPI(epi) {
 
   salvarEstoque();
   renderizarEstoque();
+
+  // Enviar o novo EPI para o Google Sheets
+  enviarEpiParaGoogleSheets(epi);
 }
 
 function removerEpi(index) {
