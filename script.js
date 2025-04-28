@@ -31,7 +31,7 @@ function renderizarEstoque() {
 }
 
 async function enviarEpiParaGoogleSheets(epi) {
-  const url = 'https://script.google.com/macros/s/AKfycbwLMdL9g7HAWedV56XHsbi5Lfz6QJpQ1t2Z_KGX9O4pXNyVLH-7DupnfoaAAMnnoa0N/exec';
+  const url = 'https://script.google.com/macros/s/AKfycbw_P-z2g0d13vgAyfRsUOMMvWBOXhGExpvDPMbmQEVRQU2Eo_WEGDJRw9JmHM_N3kgU/exec';
   
   try {
     const resposta = await fetch(url, {
