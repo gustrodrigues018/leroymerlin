@@ -32,59 +32,80 @@
         <th>Quantidade</th>
         <th>Categoria</th>
         <th>Tamanho</th>
+        <th>Ações</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Populado via JavaScript -->
+      <!-- Conteúdo dinâmico -->
     </tbody>
   </table>
 
 <script>
-  const URL_GOOGLE_SHEETS = "https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbzE7RRfLFB3fexPiUYRASUv10IuQgCPuXbXsi10hBuO1EIWw_dcXyZy6dP6RatkZ2aKEg/exec";
+  const URL_GOOGLE_SHEETS = 'https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbzE7RRfLFB3fexPiUYRASUv10IuQgCPuXbXsi10hBuO1EIWw_dcXyZy6dP6RatkZ2aKEg/exec';
 
-  async function carregarEstoque() {
-    try {
-      const resposta = await fetch(URL_GOOGLE_SHEETS);
-      const dados = await resposta.json();
-      renderizarEstoque(dados);
-    } catch (error) {
-      console.error('Erro ao carregar dados do Google Sheets:', error);
-    }
+  let estoque = [];
+
+  function gerarIdEPI(epi) {
+    return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
   }
 
-  function renderizarEstoque(dados) {
+  function carregarLocal() {
+    const dados = localStorage.getItem("estoqueEPI");
+    estoque = dados ? JSON.parse(dados) : [];
+  }
+
+  function salvarLocal() {
+    localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
+  }
+
+  function renderizarEstoque() {
     const tbody = document.querySelector('#tabelaEstoque tbody');
     tbody.innerHTML = '';
 
-    dados.forEach(epi => {
+    estoque.forEach(epi => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${epi.nome}</td>
         <td>${epi.quantidade}</td>
         <td>${epi.categoria}</td>
         <td>${epi.tamanho || '-'}</td>
+        <td>
+          <button onclick="removerEpi('${epi.id}')">Excluir</button>
+        </td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  async function enviarEpiParaGoogleSheets(epi) {
+  async function enviarEPIParaGoogleSheets(epi) {
     try {
-      const resposta = await fetch(URL_GOOGLE_SHEETS, {
+      await fetch(URL_GOOGLE_SHEETS, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(epi),
-        headers: { 'Content-Type': 'application/json' }
       });
-
-      if (resposta.ok) {
-        console.log('EPI enviado com sucesso.');
-        carregarEstoque(); // Atualiza a tabela após adicionar
-      } else {
-        console.error('Falha ao enviar EPI.');
-      }
+      console.log('EPI enviado para o Google Sheets');
     } catch (error) {
-      console.error('Erro ao conectar com o Google Sheets:', error);
+      console.error('Erro ao enviar para o Google Sheets:', error);
     }
+  }
+
+  function adicionarOuSomarEPI(epi) {
+    epi.id = gerarIdEPI(epi);
+
+    const existente = estoque.find(e => e.id === epi.id);
+
+    if (existente) {
+      existente.quantidade += epi.quantidade;
+    } else {
+      estoque.push(epi);
+    }
+
+    salvarLocal();
+    renderizarEstoque();
+    enviarEPIParaGoogleSheets(epi);
   }
 
   document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
@@ -94,10 +115,11 @@
       nome: this.nome.value.trim(),
       quantidade: parseInt(this.quantidade.value),
       categoria: this.categoria.value.trim(),
-      tamanho: this.tamanho.value.trim() || '-'
+      tamanho: this.tamanho.value.trim() || '-',
+      data: new Date().toISOString()
     };
 
-    enviarEpiParaGoogleSheets(epi);
+    adicionarOuSomarEPI(epi);
     this.reset();
   });
 
@@ -113,8 +135,15 @@
     });
   });
 
+  function removerEpi(id) {
+    estoque = estoque.filter(epi => epi.id !== id);
+    salvarLocal();
+    renderizarEstoque();
+  }
+
   window.onload = () => {
-    carregarEstoque();
+    carregarLocal();
+    renderizarEstoque();
   };
 </script>
 
