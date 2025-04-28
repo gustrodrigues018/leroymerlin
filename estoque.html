@@ -43,6 +43,8 @@
 <script>
   let estoque = [];
 
+  const URL_GOOGLE_SHEETS = 'https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbwlP_ymtYxVoafaW8Ca7vF2h0473uLeEV9czNpttLOSt42fqDGOEjUs3HqJwo9pdGIXQA/exec';
+
   function gerarIdEPI(epi) {
     return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
   }
@@ -76,8 +78,26 @@
     });
   }
 
+  async function enviarEpiParaGoogleSheets(epi) {
+    try {
+      const resposta = await fetch(URL_GOOGLE_SHEETS, {
+        method: 'POST',
+        body: JSON.stringify(epi),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (resposta.ok) {
+        console.log('EPI enviado para o Google Sheets!');
+      } else {
+        console.error('Falha ao enviar para o Google Sheets.');
+      }
+    } catch (error) {
+      console.error('Erro ao conectar com o Google Sheets:', error);
+    }
+  }
+
   function adicionarOuSomarEPI(epi) {
-    epi.id = gerarIdEPI(epi); // ID único com base nas propriedades
+    epi.id = gerarIdEPI(epi); // Gera ID único
 
     const existente = estoque.find(e => e.id === epi.id);
 
@@ -89,6 +109,7 @@
 
     salvarLocal();
     renderizarEstoque();
+    enviarEpiParaGoogleSheets(epi); // Envia para o Google Sheets também
   }
 
   document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
