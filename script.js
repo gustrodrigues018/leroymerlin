@@ -31,7 +31,7 @@ function renderizarEstoque() {
 }
 
 async function enviarEpiParaGoogleSheets(epi) {
-  const url = 'https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbzvoU9Xve6imNPFSxMkE3kq7bOO2nXPc_d_glN6hNGeNizJmO1w3tRUstPTDJ4CIG3ZDg/exec';
+  const url = 'https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbw4oPhsmoxiYq9DU9JZIHkerWJ1TPOH6NTYZUKUrI2siE4baKILysuSmv1qn8ArTvOOzg/exec';
   
   try {
     const resposta = await fetch(url, {
