@@ -36,14 +36,14 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Populado via JS -->
+      <!-- Preenchido via JavaScript -->
     </tbody>
   </table>
 
 <script>
-  let estoque = [];
+  const URL_GOOGLE_SHEETS = "https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbxlpfNDxFO0nVHRSCUJvUBNUXUh0B9x6-ImbACo8f6tziCWJ6AFp6HDLcZl7izhtQjTxw/exec";
 
-  const URL_GOOGLE_SHEETS = 'https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbwSwA5tWoonD6i6Rh-TKHyz0wExEjzM5UbTa91MY8juIro2S3qB8gq7LRVYXeXly5tjgQ/exec';
+  let estoque = [];
 
   function gerarIdEPI(epi) {
     return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
@@ -78,26 +78,8 @@
     });
   }
 
-  async function enviarEpiParaGoogleSheets(epi) {
-    try {
-      const resposta = await fetch(URL_GOOGLE_SHEETS, {
-        method: 'POST',
-        body: JSON.stringify(epi),
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (resposta.ok) {
-        console.log('EPI enviado para o Google Sheets!');
-      } else {
-        console.error('Falha ao enviar para o Google Sheets.');
-      }
-    } catch (error) {
-      console.error('Erro ao conectar com o Google Sheets:', error);
-    }
-  }
-
   function adicionarOuSomarEPI(epi) {
-    epi.id = gerarIdEPI(epi); // Gera ID único
+    epi.id = gerarIdEPI(epi); // ID único
 
     const existente = estoque.find(e => e.id === epi.id);
 
@@ -109,7 +91,30 @@
 
     salvarLocal();
     renderizarEstoque();
-    enviarEpiParaGoogleSheets(epi); // Envia para o Google Sheets também
+    enviarEpiParaGoogleSheets(epi); // <-- envia para o Sheets
+  }
+
+  async function enviarEpiParaGoogleSheets(epi) {
+    try {
+      const resposta = await fetch(URL_GOOGLE_SHEETS, {
+        method: 'POST',
+        body: JSON.stringify({
+          nome: epi.nome,
+          quantidade: epi.quantidade,
+          categoria: epi.categoria,
+          tamanho: epi.tamanho
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (resposta.ok) {
+        console.log('EPI enviado para o Google Sheets!');
+      } else {
+        console.error('Falha ao enviar para o Google Sheets.');
+      }
+    } catch (error) {
+      console.error('Erro ao conectar com o Google Sheets:', error);
+    }
   }
 
   document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
