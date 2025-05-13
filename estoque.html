@@ -3,104 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Estoque de EPIs</title>
-  <script type="module">
-    // Firebase SDK
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      projectId: "SEU_PROJECT_ID",
-      storageBucket: "SEU_PROJECT_ID.appspot.com",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const colecao = collection(db, "painel-epis");
-
-    let estoque = [];
-
-    function gerarIdEPI(epi) {
-      return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
-    }
-
-    async function carregarEstoque() {
-      estoque = [];
-      const snapshot = await getDocs(colecao);
-      snapshot.forEach(docSnap => {
-        estoque.push(docSnap.data());
-      });
-      renderizarEstoque();
-    }
-
-    async function salvarEPI(epi) {
-      const docRef = doc(db, "painel-epis", epi.id);
-      await setDoc(docRef, epi);
-    }
-
-    async function removerEpi(id) {
-      await deleteDoc(doc(db, "painel-epis", id));
-      await carregarEstoque();
-    }
-
-    function renderizarEstoque() {
-      const tbody = document.querySelector('#tabelaEstoque tbody');
-      tbody.innerHTML = '';
-      estoque.forEach(epi => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${epi.nome}</td>
-          <td>${epi.quantidade}</td>
-          <td>${epi.categoria}</td>
-          <td>${epi.tamanho || '-'}</td>
-          <td><button onclick="removerEpi('${epi.id}')">Excluir</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    window.removerEpi = removerEpi;
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      document.querySelector('#formAdicionarEPI').addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const epi = {
-          nome: this.nome.value.trim(),
-          quantidade: parseInt(this.quantidade.value),
-          categoria: this.categoria.value.trim(),
-          tamanho: this.tamanho.value.trim() || '-',
-          data: new Date().toISOString(),
-        };
-        epi.id = gerarIdEPI(epi);
-
-        const existente = estoque.find(e => e.id === epi.id);
-        if (existente) {
-          epi.quantidade += existente.quantidade;
-        }
-
-        await salvarEPI(epi);
-        await carregarEstoque();
-        this.reset();
-      });
-
-      document.querySelector('#buscaNome').addEventListener('input', function () {
-        const filtro = this.value.toLowerCase();
-        const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-        linhas.forEach(linha => {
-          const nome = linha.cells[0].textContent.toLowerCase();
-          const categoria = linha.cells[2].textContent.toLowerCase();
-          const tamanho = linha.cells[3].textContent.toLowerCase();
-          linha.style.display = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro) ? '' : 'none';
-        });
-      });
-
-      await carregarEstoque();
-    });
-  </script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
@@ -117,6 +20,11 @@
     <input type="text" id="buscaNome" placeholder="Filtrar por Nome, Categoria ou Tamanho..." />
   </div>
 
+  <div style="text-align:center; margin: 20px;">
+    <a href="index.html"><button>Voltar ao Início</button></a>
+    <a href="retiradas.html"><button>Ir para Retiradas</button></a>
+  </div>
+
   <table border="1" id="tabelaEstoque">
     <thead>
       <tr>
@@ -127,7 +35,120 @@
         <th>Ações</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <!-- Conteúdo dinâmico -->
+    </tbody>
   </table>
+
+<script>
+  const URL_GOOGLE_SHEETS = 'https://script.google.com/macros/s/AKfycbyPmb3uO5y8XEUD8Bwc9fNElpW9yfD6eXw78uXnJmvJfKFs6_S7B2SvQITqdGLxU8BE/exec';
+
+  let estoque = [];
+
+  function gerarIdEPI(epi) {
+    return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
+  }
+
+  function carregarLocal() {
+    const dados = localStorage.getItem("estoqueEPI");
+    estoque = dados ? JSON.parse(dados) : [];
+  }
+
+  function salvarLocal() {
+    localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
+  }
+
+  function renderizarEstoque() {
+    const tbody = document.querySelector('#tabelaEstoque tbody');
+    tbody.innerHTML = '';
+
+    estoque.forEach(epi => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${epi.nome}</td>
+        <td>${epi.quantidade}</td>
+        <td>${epi.categoria}</td>
+        <td>${epi.tamanho || '-'}</td>
+        <td>
+          <button onclick="removerEpi('${epi.id}')">Excluir</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+async function enviarEPIParaGoogleSheets(epi) {
+  try {
+   await fetch(URL_GOOGLE_SHEETS, {
+      method: 'POST',
+      mode: 'cors', // reforço extra
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(epi),
+    });
+    console.log('EPI enviado para o Google Sheets');
+  } catch (error) {
+    console.error('Erro ao enviar para o Google Sheets:', error);
+  }
+}
+      
+
+
+  function adicionarOuSomarEPI(epi) {
+    epi.id = gerarIdEPI(epi);
+
+    const existente = estoque.find(e => e.id === epi.id);
+
+    if (existente) {
+      existente.quantidade += epi.quantidade;
+    } else {
+      estoque.push(epi);
+    }
+
+    salvarLocal();
+    renderizarEstoque();
+    enviarEPIParaGoogleSheets(epi);
+  }
+
+  document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const epi = {
+      nome: this.nome.value.trim(),
+      quantidade: parseInt(this.quantidade.value),
+      categoria: this.categoria.value.trim(),
+      tamanho: this.tamanho.value.trim() || '-',
+      data: new Date().toISOString()
+    };
+
+    adicionarOuSomarEPI(epi);
+    this.reset();
+  });
+
+  document.querySelector('#buscaNome').addEventListener('input', function () {
+    const filtro = this.value.toLowerCase();
+    const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+    linhas.forEach(linha => {
+      const nome = linha.cells[0].textContent.toLowerCase();
+      const categoria = linha.cells[2].textContent.toLowerCase();
+      const tamanho = linha.cells[3].textContent.toLowerCase();
+      const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
+      linha.style.display = corresponde ? '' : 'none';
+    });
+  });
+
+  function removerEpi(id) {
+    estoque = estoque.filter(epi => epi.id !== id);
+    salvarLocal();
+    renderizarEstoque();
+  }
+
+  window.onload = () => {
+    carregarLocal();
+    renderizarEstoque();
+  };
+</script>
+
 </body>
 </html>
