@@ -79,7 +79,7 @@
 
 async function enviarEPIParaGoogleSheets(epi) {
   try {
-    await fetch(URL_GOOGLE_SHEETS) {
+   await fetch(URL_GOOGLE_SHEETS, {
       method: 'POST',
       mode: 'cors', // reforço extra
       headers: {
@@ -91,7 +91,8 @@ async function enviarEPIParaGoogleSheets(epi) {
   } catch (error) {
     console.error('Erro ao enviar para o Google Sheets:', error);
   }
-}
+})
+      
 
 
   function adicionarOuSomarEPI(epi) {
