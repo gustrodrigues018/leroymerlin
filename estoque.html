@@ -77,22 +77,24 @@
     });
   }
 
-  async function enviarEPIParaGoogleSheets(epi) {
-    try {
-    await fetch(URL_GOOGLE_SHEETS, {
-  method: 'POST',
-  mode: 'cors',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(epi),
-});
+const URL_GOOGLE_SHEETS = 'https://script.google.com/macros/s/AKfycb.../exec';
 
-      console.log('EPI enviado para o Google Sheets');
-    } catch (error) {
-      console.error('Erro ao enviar para o Google Sheets:', error);
-    }
+async function enviarEPIParaGoogleSheets(epi) {
+  try {
+    await fetch(URL_GOOGLE_SHEETS, {
+      method: 'POST',
+      mode: 'cors', // reforço extra
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(epi),
+    });
+    console.log('EPI enviado para o Google Sheets');
+  } catch (error) {
+    console.error('Erro ao enviar para o Google Sheets:', error);
   }
+}
+
 
   function adicionarOuSomarEPI(epi) {
     epi.id = gerarIdEPI(epi);
