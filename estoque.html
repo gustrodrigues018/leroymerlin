@@ -41,7 +41,7 @@
   </table>
 
 <script>
-  const URL_GOOGLE_SHEETS = 'https://script.google.com/macros/s/AKfycbxKZuR7byHwbJ1qw_cj2oxsxTOMLwUOCc9HKb7W2wA8oYp6jpvM_EqU1TeLPjbe-x4f/exec';
+  const URL_GOOGLE_SHEETS = 'https://script.google.com/a/macros/ext.leroymerlin.com.br/s/AKfycbx39ypdf-LXkiZB_1zp-lNv6yK4Ql5Zs60jYBB_qLLzVkMeiPeh25oO9ArMVUDAuqVc/exec';
 
   let estoque = [];
 
@@ -79,13 +79,15 @@
 
   async function enviarEPIParaGoogleSheets(epi) {
     try {
-      await fetch(URL_GOOGLE_SHEETS, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(epi),
-      });
+    await fetch(URL_GOOGLE_SHEETS, {
+  method: 'POST',
+  mode: 'cors',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(epi),
+});
+
       console.log('EPI enviado para o Google Sheets');
     } catch (error) {
       console.error('Erro ao enviar para o Google Sheets:', error);
