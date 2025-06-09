@@ -80,20 +80,22 @@
       });
     }
 
-    window.onload = async () => {
-      const id = getQueryParam('id');
-      if (!id) {
-        alert('ID do EPI não fornecido. Voltando...');
-        window.location.href = 'index.html';
-        return;
-      }
+ window.onload = async () => {
+  const id = getQueryParam('id');
+  console.log('ID do EPI recebido:', id);
+  if (!id) {
+    alert('ID do EPI não fornecido. Voltando...');
+    window.location.href = 'index.html';
+    return;
+  }
 
-      const epi = await buscarEPI(id);
-      if (!epi) {
-        alert('EPI não encontrado. Voltando...');
-        window.location.href = 'index.html';
-        return;
-      }
+  const epi = await buscarEPI(id);
+  console.log('Dados do EPI buscado:', epi);
+  if (!epi) {
+    alert('EPI não encontrado. Voltando...');
+    window.location.href = 'index.html';
+    return;
+  }
 
       preencherFormulario(epi);
 
