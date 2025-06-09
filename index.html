@@ -7,32 +7,45 @@
   <style>
     :root {
       --azul-escuro: #0d47a1;
+      --azul-medio: #1976d2;
       --azul-claro: #64b5f6;
-      --azul-pastel: #e3f2fd;
       --branco: #ffffff;
-      --cinza-claro: #f5f5f5;
-      --sombra: rgba(0, 0, 0, 0.1);
+      --sombra: rgba(0, 0, 0, 0.2);
     }
 
     body {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: var(--cinza-claro);
-      color: var(--azul-escuro);
+      background-color: var(--azul-escuro);
+      color: var(--branco);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
       text-align: center;
-      background: linear-gradient(120deg, var(--azul-pastel), var(--branco));
+      position: relative;
+    }
+
+    .decoracao-topo {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(to right, var(--azul-claro), var(--azul-medio));
+      box-shadow: 0 4px 8px var(--sombra);
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      border-bottom-left-radius: 50% 20%;
+      border-bottom-right-radius: 50% 20%;
     }
 
     h1 {
+      margin-top: 160px;
       font-size: 3rem;
-      margin-bottom: 40px;
-      text-shadow: 1px 1px 2px var(--sombra);
+      z-index: 1;
+      text-shadow: 1px 1px 4px var(--sombra);
     }
 
     .botoes {
@@ -40,17 +53,19 @@
       gap: 40px;
       flex-wrap: wrap;
       justify-content: center;
+      margin-top: 50px;
+      z-index: 1;
     }
 
     .botao-painel {
-      background: linear-gradient(135deg, var(--azul-claro), var(--branco));
+      background-color: var(--branco);
       color: var(--azul-escuro);
       border: none;
       padding: 20px 40px;
       font-size: 20px;
       border-radius: 12px;
-      box-shadow: 0 8px 16px var(--sombra);
-      transition: transform 0.3s ease, background-color 0.3s ease;
+      box-shadow: 0 6px 12px var(--sombra);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
       min-width: 250px;
       text-transform: uppercase;
@@ -59,14 +74,14 @@
 
     .botao-painel:hover {
       transform: scale(1.05);
-      background-color: #bbdefb;
+      box-shadow: 0 10px 20px var(--sombra);
     }
 
     footer {
-      position: absolute;
-      bottom: 20px;
+      margin-top: auto;
+      padding: 20px;
       font-size: 0.9rem;
-      color: #444;
+      color: #ccc;
     }
 
     @media (max-width: 600px) {
@@ -77,18 +92,21 @@
       .botao-painel {
         padding: 16px 24px;
         font-size: 18px;
+        min-width: 200px;
       }
     }
   </style>
 </head>
 <body>
+  <div class="decoracao-topo"></div>
   <h1>Painel de Controle de EPIs</h1>
+
   <div class="botoes">
     <a href="estoque.html">
       <button class="botao-painel">Estoque de EPI</button>
     </a>
   </div>
+
   <footer>&copy; 2025 Leroy Merlin - Gestão de EPIs</footer>
 </body>
 </html>
-
