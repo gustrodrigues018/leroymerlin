@@ -238,16 +238,20 @@ window.confirmarRemocao = function(id) {
     });
 
     document.querySelector('#buscaNome').addEventListener('input', function () {
-      const filtro = this.value.toLowerCase();
-      const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-      linhas.forEach(linha => {
-        const nome = linha.cells[0].textContent.toLowerCase();
-        const categoria = linha.cells[2].textContent.toLowerCase();
-        const tamanho = linha.cells[3].textContent.toLowerCase();
-        const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
-        linha.style.display = corresponde ? '' : 'none';
-      });
-    });
+  const filtro = this.value.toLowerCase().trim();
+  const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+  linhas.forEach(linha => {
+    const textoCompleto = (
+      linha.cells[0].textContent + ' ' +  // Nome
+      linha.cells[2].textContent + ' ' +  // Categoria
+      linha.cells[3].textContent          // Tamanho
+    ).toLowerCase();
+
+    const corresponde = textoCompleto.includes(filtro);
+    linha.style.display = corresponde ? '' : 'none';
+  });
+});
+
 
     window.onload = () => {
       carregarEstoque();
