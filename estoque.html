@@ -40,115 +40,128 @@
     </tbody>
   </table>
 
-<script>
-  const URL_GOOGLE_SHEETS = 'https://script.google.com/macros/s/AKfycbyPmb3uO5y8XEUD8Bwc9fNElpW9yfD6eXw78uXnJmvJfKFs6_S7B2SvQITqdGLxU8BE/exec';
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
-  let estoque = [];
-
-  function gerarIdEPI(epi) {
-    return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
-  }
-
-  function carregarLocal() {
-    const dados = localStorage.getItem("estoqueEPI");
-    estoque = dados ? JSON.parse(dados) : [];
-  }
-
-  function salvarLocal() {
-    localStorage.setItem("estoqueEPI", JSON.stringify(estoque));
-  }
-
-  function renderizarEstoque() {
-    const tbody = document.querySelector('#tabelaEstoque tbody');
-    tbody.innerHTML = '';
-
-    estoque.forEach(epi => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${epi.nome}</td>
-        <td>${epi.quantidade}</td>
-        <td>${epi.categoria}</td>
-        <td>${epi.tamanho || '-'}</td>
-        <td>
-          <button onclick="removerEpi('${epi.id}')">Excluir</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-async function enviarEPIParaGoogleSheets(epi) {
-  try {
-   await fetch(URL_GOOGLE_SHEETS, {
-      method: 'POST',
-      mode: 'cors', // reforço extra
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(epi),
-    });
-    console.log('EPI enviado para o Google Sheets');
-  } catch (error) {
-    console.error('Erro ao enviar para o Google Sheets:', error);
-  }
-}
-      
-
-
-  function adicionarOuSomarEPI(epi) {
-    epi.id = gerarIdEPI(epi);
-
-    const existente = estoque.find(e => e.id === epi.id);
-
-    if (existente) {
-      existente.quantidade += epi.quantidade;
-    } else {
-      estoque.push(epi);
-    }
-
-    salvarLocal();
-    renderizarEstoque();
-    enviarEPIParaGoogleSheets(epi);
-  }
-
-  document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const epi = {
-      nome: this.nome.value.trim(),
-      quantidade: parseInt(this.quantidade.value),
-      categoria: this.categoria.value.trim(),
-      tamanho: this.tamanho.value.trim() || '-',
-      data: new Date().toISOString()
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+      authDomain: "leroycontroll.firebaseapp.com",
+      databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
+      projectId: "leroycontroll",
+      storageBucket: "leroycontroll.firebasestorage.app",
+      messagingSenderId: "6215288603",
+      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
     };
 
-    adicionarOuSomarEPI(epi);
-    this.reset();
-  });
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  document.querySelector('#buscaNome').addEventListener('input', function () {
-    const filtro = this.value.toLowerCase();
-    const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-    linhas.forEach(linha => {
-      const nome = linha.cells[0].textContent.toLowerCase();
-      const categoria = linha.cells[2].textContent.toLowerCase();
-      const tamanho = linha.cells[3].textContent.toLowerCase();
-      const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
-      linha.style.display = corresponde ? '' : 'none';
+    const URL_GOOGLE_SHEETS = 'https://script.google.com/macros/s/AKfycbyPmb3uO5y8XEUD8Bwc9fNElpW9yfD6eXw78uXnJmvJfKFs6_S7B2SvQITqdGLxU8BE/exec';
+
+    let estoque = [];
+
+    function gerarIdEPI(epi) {
+      return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
+    }
+
+    async function carregarDoFirestore() {
+      estoque = [];
+      const snapshot = await db.collection("estoque").get();
+      snapshot.forEach(doc => {
+        estoque.push({ id: doc.id, ...doc.data() });
+      });
+      renderizarEstoque();
+    }
+
+    async function adicionarOuSomarEPI(epi) {
+      const id = gerarIdEPI(epi);
+      epi.id = id;
+
+      const docRef = db.collection("estoque").doc(id);
+      const docSnap = await docRef.get();
+
+      if (docSnap.exists) {
+        const existente = docSnap.data();
+        await docRef.update({ quantidade: existente.quantidade + epi.quantidade });
+      } else {
+        await docRef.set(epi);
+      }
+
+      carregarDoFirestore();
+      enviarEPIParaGoogleSheets(epi);
+    }
+
+    async function removerEpi(id) {
+      await db.collection("estoque").doc(id).delete();
+      carregarDoFirestore();
+    }
+
+    function renderizarEstoque() {
+      const tbody = document.querySelector('#tabelaEstoque tbody');
+      tbody.innerHTML = '';
+
+      estoque.forEach(epi => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${epi.nome}</td>
+          <td>${epi.quantidade}</td>
+          <td>${epi.categoria}</td>
+          <td>${epi.tamanho || '-'}</td>
+          <td>
+            <button onclick="removerEpi('${epi.id}')">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function enviarEPIParaGoogleSheets(epi) {
+      try {
+        await fetch(URL_GOOGLE_SHEETS, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(epi),
+        });
+        console.log('EPI enviado para o Google Sheets');
+      } catch (error) {
+        console.error('Erro ao enviar para o Google Sheets:', error);
+      }
+    }
+
+    document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const epi = {
+        nome: this.nome.value.trim(),
+        quantidade: parseInt(this.quantidade.value),
+        categoria: this.categoria.value.trim(),
+        tamanho: this.tamanho.value.trim() || '-',
+        data: new Date().toISOString()
+      };
+
+      adicionarOuSomarEPI(epi);
+      this.reset();
     });
-  });
 
-  function removerEpi(id) {
-    estoque = estoque.filter(epi => epi.id !== id);
-    salvarLocal();
-    renderizarEstoque();
-  }
+    document.querySelector('#buscaNome').addEventListener('input', function () {
+      const filtro = this.value.toLowerCase();
+      const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+      linhas.forEach(linha => {
+        const nome = linha.cells[0].textContent.toLowerCase();
+        const categoria = linha.cells[2].textContent.toLowerCase();
+        const tamanho = linha.cells[3].textContent.toLowerCase();
+        const corresponde = nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro);
+        linha.style.display = corresponde ? '' : 'none';
+      });
+    });
 
-  window.onload = () => {
-    carregarLocal();
-    renderizarEstoque();
-  };
-</script>
-
+    window.onload = () => {
+      carregarDoFirestore();
+    };
+  </script>
 </body>
 </html>
+
