@@ -77,19 +77,26 @@
       }
     }
 
-    function adicionarLinhaNaTabela(epi) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${epi.nome}</td>
-        <td>${epi.quantidade}</td>
-        <td>${epi.categoria}</td>
-        <td>${epi.tamanho || '-'}</td>
-        <td>
-          <button onclick="removerEpi('${epi.id}')">Excluir</button>
-        </td>
-      `;
-      tabela.appendChild(tr);
-    }
+   function adicionarLinhaNaTabela(epi) {
+  const tr = document.createElement('tr');
+
+  const nome = epi.nome || 'N/A';
+  const quantidade = epi.quantidade ?? 'N/A';
+  const categoria = epi.categoria || 'N/A';
+  const tamanho = epi.tamanho || '-';
+
+  tr.innerHTML = `
+    <td>${nome}</td>
+    <td>${quantidade}</td>
+    <td>${categoria}</td>
+    <td>${tamanho}</td>
+    <td>
+      <button onclick="removerEpi('${epi.id}')">Excluir</button>
+    </td>
+  `;
+  tabela.appendChild(tr);
+}
+
 
     async function adicionarOuSomarEPI(epi) {
       const id = gerarIdEPI(epi);
