@@ -76,7 +76,11 @@
       }
     }
 
-   function adicionarLinhaNaTabela(epi) {
+
+
+
+    
+ function adicionarLinhaNaTabela(epi) {
   const tr = document.createElement('tr');
 
   const nome = epi.nome || 'N/A';
@@ -90,13 +94,69 @@
     <td>${categoria}</td>
     <td>${tamanho}</td>
     <td>
-      <button onclick="removerEpi('${epi.id}')">Excluir</button>
+      <button onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">Editar</button>
+      <button onclick="alterarQuantidade('${epi.id}', 1)">+</button>
+      <button onclick="alterarQuantidade('${epi.id}', -1)">−</button>
+      <button onclick="confirmarRemocao('${epi.id}')">Excluir</button>
     </td>
   `;
   tabela.appendChild(tr);
 }
 
+window.editarEpi = async function(id, nome, quantidade, categoria, tamanho) {
+  const novoNome = prompt("Novo nome do EPI:", nome);
+  if (!novoNome) return;
 
+  const novaQuantidade = prompt("Nova quantidade:", quantidade);
+  if (novaQuantidade === null) return;
+
+  const novaCategoria = prompt("Nova categoria:", categoria);
+  if (!novaCategoria) return;
+
+  const novoTamanho = prompt("Novo tamanho:", tamanho);
+  if (novoTamanho === null) return;
+
+  const novoId = gerarIdEPI({ nome: novoNome, categoria: novaCategoria, tamanho: novoTamanho });
+
+  const epiRefAtual = ref(db, `estoque/${id}`);
+  const epiRefNovo = ref(db, `estoque/${novoId}`);
+
+  if (id !== novoId) await remove(epiRefAtual);
+
+  await set(epiRefNovo, {
+    nome: novoNome,
+    quantidade: parseInt(novaQuantidade),
+    categoria: novaCategoria,
+    tamanho: novoTamanho,
+    data: new Date().toISOString()
+  });
+
+  carregarEstoque();
+};
+
+window.alterarQuantidade = async function(id, delta) {
+  const epiRef = ref(db, `estoque/${id}`);
+  const snapshot = await get(epiRef);
+  const epi = snapshot.val();
+  if (!epi) return;
+
+  const novaQuantidade = (parseInt(epi.quantidade) || 0) + delta;
+  if (novaQuantidade < 0) return alert("Quantidade não pode ser negativa.");
+
+  await update(epiRef, { quantidade: novaQuantidade });
+  carregarEstoque();
+};
+
+window.confirmarRemocao = function(id) {
+  if (confirm("Tem certeza que deseja excluir este EPI?")) {
+    removerEpi(id);
+  }
+};
+
+
+    
+
+    
     async function adicionarOuSomarEPI(epi) {
       const id = gerarIdEPI(epi);
       const epiRef = ref(db, `estoque/${id}`);
