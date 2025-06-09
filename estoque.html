@@ -80,47 +80,65 @@
 
 
     
- function adicionarLinhaNaTabela(epi) {
-  const tr = document.createElement('tr');
+   
+  function adicionarLinhaNaTabela(epi) {
+    const tr = document.createElement('tr');
 
-  const nome = epi.nome || 'N/A';
-  const quantidade = epi.quantidade ?? 'N/A';
-  const categoria = epi.categoria || 'N/A';
-  const tamanho = epi.tamanho || '-';
+    const nome = epi.nome || 'N/A';
+    const quantidade = epi.quantidade ?? 'N/A';
+    const categoria = epi.categoria || 'N/A';
+    const tamanho = epi.tamanho || '-';
 
-  tr.innerHTML = `
-    <td>${nome}</td>
-    <td>${quantidade}</td>
-    <td>${categoria}</td>
-    <td>${tamanho}</td>
-    <td>
-      <button 
-        style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
-        onclick="alterarQuantidade('${epi.id}', 1)">
-        +
-      </button>
+    // Checar se está em modo mobile
+    const isMobile = window.innerWidth < 768;
 
-      <button 
-        style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
-        onclick="alterarQuantidade('${epi.id}', -1)">
-        −
-      </button>
-      
-      <button 
-        style="background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
-        onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">
-        Editar
-      </button>
+    let acoesHTML = '';
 
-      <button 
-        style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
-        onclick="confirmarRemocao('${epi.id}')">
-        Excluir
-      </button>
-    </td>
-  `;
-  tabela.appendChild(tr);
-}
+    if (isMobile) {
+      acoesHTML = `
+        <div style="position: relative;">
+          <button onclick="toggleMenu(this)" style="background-color: #2ecc71; color: white; border: none; padding: 5px 8px; border-radius: 4px;">Ações</button>
+          <div class="menu-mobile" style="display: none; position: absolute; top: 30px; left: 0; background: white; border: 1px solid #ccc; z-index: 999; border-radius: 5px;">
+            <button onclick="alterarQuantidade('${epi.id}', 1)" style="display:block; width: 100%;">+ Adicionar</button>
+            <button onclick="alterarQuantidade('${epi.id}', -1)" style="display:block; width: 100%;">− Remover</button>
+            <button onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')" style="display:block; width: 100%;">Editar</button>
+            <button onclick="confirmarRemocao('${epi.id}')" style="display:block; width: 100%; color: red;">Excluir</button>
+          </div>
+        </div>
+      `;
+    } else {
+      acoesHTML = `
+        <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
+          onclick="alterarQuantidade('${epi.id}', 1)">+</button>
+        <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
+          onclick="alterarQuantidade('${epi.id}', -1)">−</button>
+        <button style="background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
+          onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">Editar</button>
+        <button style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
+          onclick="confirmarRemocao('${epi.id}')">Excluir</button>
+      `;
+    }
+
+    tr.innerHTML = `
+      <td>${nome}</td>
+      <td>${quantidade}</td>
+      <td>${categoria}</td>
+      <td>${tamanho}</td>
+      <td>${acoesHTML}</td>
+    `;
+
+    tabela.appendChild(tr);
+  }
+
+  window.toggleMenu = function (btn) {
+    const menu = btn.nextElementSibling;
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+
+    // Fechar outros menus
+    document.querySelectorAll('.menu-mobile').forEach(m => {
+      if (m !== menu) m.style.display = 'none';
+    });
+  };
 
 window.editarEpi = async function(id, nome, quantidade, categoria, tamanho) {
   const novoNome = prompt("Novo nome do EPI:", nome);
@@ -173,7 +191,8 @@ window.confirmarRemocao = function(id) {
 };
 
 
-    
+
+
 
     
     async function adicionarOuSomarEPI(epi) {
