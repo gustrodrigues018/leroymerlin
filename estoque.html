@@ -245,8 +245,18 @@ window.confirmarRemocao = function(id) {
     const nome = linha.cells[0].textContent.toLowerCase();
     const tamanho = linha.cells[3].textContent.toLowerCase();
     
-    const textoCombinado = `${nome} ${tamanho}`;
-    linha.style.display = textoCombinado.includes(filtro) ? '' : 'none';
+   const textoCombinado = `${nome} ${linha.cells[2].textContent.toLowerCase()} ${tamanho}`;
+
+// Quebra o que o usuário digitou em palavras individuais
+const palavras = filtro.split(/\s+/);
+
+// Verifica se todas as palavras aparecem como palavra inteira em algum campo
+const corresponde = palavras.every(palavra => {
+  const regex = new RegExp(`\\b${palavra}\\b`, 'i'); // 'g' só pega 'g', não 'gg'
+  return regex.test(textoCombinado);
+});
+
+linha.style.display = corresponde ? '' : 'none';
   });
 });
 
