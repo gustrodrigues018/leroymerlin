@@ -48,9 +48,8 @@
     const firebaseConfig = {
       apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
       authDomain: "leroycontroll.firebaseapp.com",
-      databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
       projectId: "leroycontroll",
-      storageBucket: "leroycontroll.firebasestorage.app",
+      storageBucket: "leroycontroll.appspot.com",
       messagingSenderId: "6215288603",
       appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
     };
@@ -109,9 +108,7 @@
           <td>${epi.quantidade}</td>
           <td>${epi.categoria}</td>
           <td>${epi.tamanho || '-'}</td>
-          <td>
-            <button onclick="removerEpi('${epi.id}')">Excluir</button>
-          </td>
+          <td><button onclick="removerEpi('${epi.id}')">Excluir</button></td>
         `;
         tbody.appendChild(tr);
       });
@@ -164,4 +161,3 @@
   </script>
 </body>
 </html>
-
