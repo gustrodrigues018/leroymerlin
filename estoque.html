@@ -95,12 +95,6 @@
     <td>${tamanho}</td>
     <td>
       <button 
-        style="background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
-        onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">
-        Editar
-      </button>
-
-      <button 
         style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
         onclick="alterarQuantidade('${epi.id}', 1)">
         +
@@ -110,6 +104,12 @@
         style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
         onclick="alterarQuantidade('${epi.id}', -1)">
         −
+      </button>
+      
+      <button 
+        style="background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
+        onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">
+        Editar
       </button>
 
       <button 
