@@ -42,12 +42,13 @@
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
 
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
       authDomain: "leroycontroll.firebaseapp.com",
+      databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
       projectId: "leroycontroll",
       storageBucket: "leroycontroll.appspot.com",
       messagingSenderId: "6215288603",
@@ -55,82 +56,65 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const db = firebase.database();
 
-    const URL_GOOGLE_SHEETS = 'https://script.google.com/macros/s/AKfycbyPmb3uO5y8XEUD8Bwc9fNElpW9yfD6eXw78uXnJmvJfKFs6_S7B2SvQITqdGLxU8BE/exec';
-
-    let estoque = [];
+    const tabela = document.querySelector('#tabelaEstoque tbody');
 
     function gerarIdEPI(epi) {
       return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
     }
 
-    async function carregarDoFirestore() {
-      estoque = [];
-      const snapshot = await db.collection("estoque").get();
-      snapshot.forEach(doc => {
-        estoque.push({ id: doc.id, ...doc.data() });
-      });
-      renderizarEstoque();
+    async function carregarEstoque() {
+      tabela.innerHTML = '';
+      const snapshot = await db.ref('estoque').once('value');
+      const dados = snapshot.val();
+
+      if (dados) {
+        Object.entries(dados).forEach(([id, epi]) => {
+          adicionarLinhaNaTabela({ id, ...epi });
+        });
+      }
+    }
+
+    function adicionarLinhaNaTabela(epi) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${epi.nome}</td>
+        <td>${epi.quantidade}</td>
+        <td>${epi.categoria}</td>
+        <td>${epi.tamanho || '-'}</td>
+        <td>
+          <button onclick="removerEpi('${epi.id}')">Excluir</button>
+        </td>
+      `;
+      tabela.appendChild(tr);
     }
 
     async function adicionarOuSomarEPI(epi) {
       const id = gerarIdEPI(epi);
-      epi.id = id;
+      const ref = db.ref(`estoque/${id}`);
 
-      const docRef = db.collection("estoque").doc(id);
-      const docSnap = await docRef.get();
+      const snapshot = await ref.once('value');
+      const existente = snapshot.val();
 
-      if (docSnap.exists) {
-        const existente = docSnap.data();
-        await docRef.update({ quantidade: existente.quantidade + epi.quantidade });
+      if (existente) {
+        await ref.update({
+          quantidade: parseInt(existente.quantidade) + parseInt(epi.quantidade)
+        });
       } else {
-        await docRef.set(epi);
+        await ref.set(epi);
       }
 
-      carregarDoFirestore();
-      enviarEPIParaGoogleSheets(epi);
+      carregarEstoque();
     }
 
     async function removerEpi(id) {
-      await db.collection("estoque").doc(id).delete();
-      carregarDoFirestore();
-    }
-
-    function renderizarEstoque() {
-      const tbody = document.querySelector('#tabelaEstoque tbody');
-      tbody.innerHTML = '';
-
-      estoque.forEach(epi => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${epi.nome}</td>
-          <td>${epi.quantidade}</td>
-          <td>${epi.categoria}</td>
-          <td>${epi.tamanho || '-'}</td>
-          <td><button onclick="removerEpi('${epi.id}')">Excluir</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    async function enviarEPIParaGoogleSheets(epi) {
-      try {
-        await fetch(URL_GOOGLE_SHEETS, {
-          method: 'POST',
-          mode: 'cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(epi),
-        });
-        console.log('EPI enviado para o Google Sheets');
-      } catch (error) {
-        console.error('Erro ao enviar para o Google Sheets:', error);
-      }
+      await db.ref(`estoque/${id}`).remove();
+      carregarEstoque();
     }
 
     document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
       e.preventDefault();
-
       const epi = {
         nome: this.nome.value.trim(),
         quantidade: parseInt(this.quantidade.value),
@@ -156,7 +140,7 @@
     });
 
     window.onload = () => {
-      carregarDoFirestore();
+      carregarEstoque();
     };
   </script>
 </body>
