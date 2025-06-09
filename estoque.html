@@ -94,30 +94,32 @@
 
     let acoesHTML = '';
 
-    if (isMobile) {
-      acoesHTML = `
-        <div style="position: relative;">
-          <button onclick="toggleMenu(this)" style="background-color: #2ecc71; color: white; border: none; padding: 5px 8px; border-radius: 4px;">Ações</button>
-          <div class="menu-mobile" style="display: none; position: absolute; top: 30px; left: 0; background: white; border: 1px solid #ccc; z-index: 999; border-radius: 5px;">
-            <button onclick="alterarQuantidade('${epi.id}', 1)" style="display:block; width: 100%;">+ Adicionar</button>
-            <button onclick="alterarQuantidade('${epi.id}', -1)" style="display:block; width: 100%;">− Remover</button>
-            <button onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')" style="display:block; width: 100%;">Editar</button>
-            <button onclick="confirmarRemocao('${epi.id}')" style="display:block; width: 100%; color: red;">Excluir</button>
-          </div>
-        </div>
-      `;
-    } else {
-      acoesHTML = `
-        <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
-          onclick="alterarQuantidade('${epi.id}', 1)">+</button>
-        <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
-          onclick="alterarQuantidade('${epi.id}', -1)">−</button>
-        <button style="background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
-          onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">Editar</button>
-        <button style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
-          onclick="confirmarRemocao('${epi.id}')">Excluir</button>
-      `;
-    }
+   
+if (isMobile) {
+  acoesHTML = `
+    <div style="position: relative;">
+      <button onclick="toggleMenu(this)" style="background-color: #2ecc71; color: white; border: none; padding: 5px 8px; border-radius: 4px;">Ações</button>
+      <div class="menu-mobile" style="display: none; position: absolute; top: 30px; left: 0; background: white; border: 1px solid #ccc; z-index: 999; border-radius: 5px;">
+        <button onclick="alterarQuantidade('${epi.id}', 1)" style="display:block; width: 100%;">+ Adicionar</button>
+        <button onclick="alterarQuantidade('${epi.id}', -1)" style="display:block; width: 100%;">− Remover</button>
+        <a href="editar_epi.html?id=${encodeURIComponent(epi.id)}" style="display:block; width: 100%; padding: 6px 0; text-align:center; color:#3498db; text-decoration:none;">Editar</a>
+        <button onclick="confirmarRemocao('${epi.id}')" style="display:block; width: 100%; color: red;">Excluir</button>
+      </div>
+    </div>
+  `;
+} else {
+  acoesHTML = `
+    <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
+      onclick="alterarQuantidade('${epi.id}', 1)">+</button>
+    <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
+      onclick="alterarQuantidade('${epi.id}', -1)">−</button>
+    <a href="editar_epi.html?id=${encodeURIComponent(epi.id)}" style="background-color: #3498db; color: white; border-radius: 4px; padding: 5px 8px; text-decoration:none; margin-right: 4px; display:inline-block;">
+      Editar
+    </a>
+    <button style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
+      onclick="confirmarRemocao('${epi.id}')">Excluir</button>
+  `;
+}
 
     tr.innerHTML = `
       <td>${nome}</td>
