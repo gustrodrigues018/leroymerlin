@@ -113,10 +113,10 @@ if (isMobile) {
       onclick="alterarQuantidade('${epi.id}', 1)">+</button>
     <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
       onclick="alterarQuantidade('${epi.id}', -1)">−</button>
-   <a href="editar_epi.html?id=${encodeURIComponent(epi.id)}" 
-   style="background-color: #3498db; color: white; border-radius: 4px; padding: 5px 8px; text-decoration:none; margin-right: 4px; display:inline-block;">
-   Editar
-</a>
+  <button style="background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px; cursor: pointer;"
+  onclick="window.location.href='editar_epi.html?id=${encodeURIComponent(epi.id)}'">
+  Editar
+</button>
     </a>
     <button style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
       onclick="confirmarRemocao('${epi.id}')">Excluir</button>
