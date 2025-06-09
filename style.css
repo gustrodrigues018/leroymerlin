@@ -1,153 +1,173 @@
-  .btn-editar {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .btn-editar:hover {
-    background-color: #0056b3;
-  }
-
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-content {
-    background-color: white;
-    padding: 16px;
-    border-radius: 8px;
-    width: 300px;
-  }
-
-  .modal input {
-    width: 100%;
-    margin: 6px 0;
-  }
-
-  .centralizado {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .centralizado input {
-    width: 80%; /* Ajuste conforme necessário */
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-
-
-/* Paleta: verde-escuro, verde-claro, bege, branco */
-td, th, p, h1, h2, h3, label, input, button {
-  text-transform: uppercase;
+  :root {
+  --azul-escuro: #0d47a1;
+  --azul-claro: #64b5f6;
+  --azul-hover: #1565c0;
+  --azul-extra-claro: #e3f2fd;
+  --branco: #ffffff;
+  --cinza-claro: #f5f5f5;
+  --sombra: rgba(0, 0, 0, 0.1);
 }
 
 body {
-    text-transform: uppercase;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    background-color: #fdfaf4; /* bege claro */
-    color: #333;
-  }
-  
-  h1, h2 {
-    text-align: center;
-    color: #2e7d32; /* verde-escuro */
-    margin-top: 20px;
-  }
-  
-  form {
-    background-color: #e8f5e9; /* verde-claro */
-    border: 1px solid #c8e6c9;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  input[type="text"],
-  input[type="number"] {
-    width: calc(33% - 12px);
-    padding: 10px;
-    margin: 5px;
-    border: 1px solid #a5d6a7;
-    border-radius: 8px;
-    background-color: #fff;
-  }
-  
-  button {
-    background-color: #66bb6a;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    margin: 5px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  button:hover {
-    background-color: #4caf50;
-  }
-  
-  table {
-    width: 90%;
-    margin: 0 auto 30px auto;
-    border-collapse: collapse;
-    background-color: #ffffff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-    
-  }
-  
-  th {
-    background-color: #a5d6a7; /* verde claro */
-    color: #1b5e20; /* verde mais escuro */
-    padding: 12px;
-    
-  }
-  
-  td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    text-align: center;
-  }
-  
-  
-  tr:nth-child(even) {
-    background-color: #f1f8e9; /* verde-bege claro */
-  }
-  
-  tr:hover {
-    background-color: #dcedc8; /* hover com tom pastel */
-  }
-  
-  td button {
-    background-color: #e53935;
-    border: none;
-    padding: 6px 10px;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  td button:hover {
-    background-color: #c62828;
-  }
-  
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background-color: var(--azul-escuro);
+  color: var(--branco);
+  text-transform: uppercase;
+}
+
+h1, h2 {
+  text-align: center;
+  color: var(--branco);
+  margin-top: 20px;
+}
+
+form {
+  background-color: var(--branco);
+  color: var(--azul-escuro);
+  border: 1px solid var(--azul-claro);
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px var(--sombra);
+}
+
+input[type="text"],
+input[type="number"] {
+  width: calc(33% - 12px);
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid var(--azul-claro);
+  border-radius: 8px;
+  background-color: var(--branco);
+  color: var(--azul-escuro);
+}
+
+button {
+  background-color: var(--branco);
+  color: var(--azul-escuro);
+  padding: 10px 15px;
+  border: 2px solid var(--azul-claro);
+  margin: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: var(--azul-hover);
+  color: var(--branco);
+}
+
+table {
+  width: 90%;
+  margin: 0 auto 30px auto;
+  border-collapse: collapse;
+  background-color: var(--branco);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 15px var(--sombra);
+}
+
+th {
+  background-color: var(--azul-claro);
+  color: var(--azul-escuro);
+  padding: 12px;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  color: var(--azul-escuro);
+}
+
+tr:nth-child(even) {
+  background-color: var(--azul-extra-claro);
+}
+
+tr:hover {
+  background-color: var(--azul-claro);
+  color: var(--branco);
+}
+
+/* Botão de deletar */
+td button {
+  background-color: #e53935;
+  border: none;
+  padding: 6px 10px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+td button:hover {
+  background-color: #c62828;
+}
+
+/* Botão de editar */
+.btn-editar {
+  background-color: var(--branco);
+  color: var(--azul-escuro);
+  border: 2px solid var(--azul-claro);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-editar:hover {
+  background-color: var(--azul-hover);
+  color: var(--branco);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--branco);
+  padding: 16px;
+  border-radius: 8px;
+  width: 300px;
+  color: var(--azul-escuro);
+  box-shadow: 0 0 10px var(--sombra);
+}
+
+.modal input {
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px;
+  border: 1px solid var(--azul-claro);
+  border-radius: 4px;
+}
+
+/* Centralizado */
+.centralizado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.centralizado input {
+  width: 80%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--azul-claro);
+  background-color: var(--branco);
+  color: var(--azul-escuro);
+}
