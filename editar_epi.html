@@ -37,39 +37,37 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Pega parâmetros da URL
-    function getQueryParams() {
-      const params = new URLSearchParams(window.location.search);
-      return {
-        id: params.get('id'),
-        nome: params.get('nome'),
-        quantidade: params.get('quantidade'),
-        categoria: params.get('categoria'),
-        tamanho: params.get('tamanho')
-      };
+    function getQueryParam(param) {
+      return new URLSearchParams(window.location.search).get(param);
     }
 
-    // Gera id baseado em nome, categoria e tamanho
     function gerarIdEPI(epi) {
       return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
     }
 
-    // Preenche o formulário com os dados da URL
+    async function buscarEPI(id) {
+      const epiRef = ref(db, `estoque/${id}`);
+      const snapshot = await get(epiRef);
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        return null;
+      }
+    }
+
     function preencherFormulario(dados) {
       document.getElementById('nome').value = dados.nome || '';
       document.getElementById('quantidade').value = dados.quantidade || 0;
       document.getElementById('categoria').value = dados.categoria || '';
-      document.getElementById('tamanho').value = dados.tamanho || '';
+      document.getElementById('tamanho').value = dados.tamanho === '-' ? '' : dados.tamanho || '';
     }
 
-    // Atualiza o EPI no Firebase
     async function atualizarEPI(idAntigo, dados) {
       const novoId = gerarIdEPI(dados);
       const refAntigo = ref(db, `estoque/${idAntigo}`);
       const refNovo = ref(db, `estoque/${novoId}`);
 
       if (idAntigo !== novoId) {
-        // Remove antigo e cria novo
         await remove(refAntigo);
       }
 
@@ -82,16 +80,22 @@
       });
     }
 
-    window.onload = () => {
-      const dados = getQueryParams();
-
-      if (!dados.id) {
+    window.onload = async () => {
+      const id = getQueryParam('id');
+      if (!id) {
         alert('ID do EPI não fornecido. Voltando...');
         window.location.href = 'index.html';
         return;
       }
 
-      preencherFormulario(dados);
+      const epi = await buscarEPI(id);
+      if (!epi) {
+        alert('EPI não encontrado. Voltando...');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      preencherFormulario(epi);
 
       const form = document.getElementById('formEditarEPI');
       form.addEventListener('submit', async (e) => {
@@ -108,7 +112,7 @@
         }
 
         try {
-          await atualizarEPI(dados.id, { nome, quantidade, categoria, tamanho });
+          await atualizarEPI(id, { nome, quantidade, categoria, tamanho });
           alert('EPI atualizado com sucesso!');
           window.location.href = 'index.html';
         } catch (error) {
