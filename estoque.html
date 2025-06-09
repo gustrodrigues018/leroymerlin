@@ -3,97 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Estoque de EPIs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    form, .centralizado, .tabela-container {
-      max-width: 800px;
-      margin: auto;
-    }
-
-    input, button {
-      padding: 10px;
-      margin: 5px 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-
-    .acoes-btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      justify-content: center;
-    }
-
-    .acoes-mobile {
-      display: none;
-    }
-
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #f9f9f9;
-      min-width: 120px;
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-      z-index: 1;
-    }
-
-    .dropdown-content button {
-      background: none;
-      border: none;
-      width: 100%;
-      padding: 10px;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
-
-    @media (max-width: 768px) {
-      .acoes-btns {
-        display: none;
-      }
-
-      .acoes-mobile {
-        display: block;
-      }
-
-      table {
-        font-size: 14px;
-      }
-
-      th:nth-child(5), td:nth-child(5) {
-        min-width: 100px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Estoque de EPIs</h1>
@@ -114,23 +24,22 @@
     <a href="index.html"><button>Voltar ao Início</button></a>
   </div>
 
-  <div class="tabela-container">
-    <table border="1" id="tabelaEstoque">
-      <thead>
-        <tr>
-          <th>Nome do EPI</th>
-          <th>Quantidade</th>
-          <th>Categoria</th>
-          <th>Tamanho</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Conteúdo dinâmico -->
-      </tbody>
-    </table>
-  </div>
+  <table border="1" id="tabelaEstoque">
+    <thead>
+      <tr>
+        <th>Nome do EPI</th>
+        <th>Quantidade</th>
+        <th>Categoria</th>
+        <th>Tamanho</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Conteúdo dinâmico -->
+    </tbody>
+  </table>
 
+  <!-- Firebase SDKs (modular) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -147,6 +56,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
     const tabela = document.querySelector('#tabelaEstoque tbody');
 
     function gerarIdEPI(epi) {
@@ -166,94 +76,110 @@
       }
     }
 
-    function adicionarLinhaNaTabela(epi) {
-      const tr = document.createElement('tr');
-      const nome = epi.nome || 'N/A';
-      const quantidade = epi.quantidade ?? 'N/A';
-      const categoria = epi.categoria || 'N/A';
-      const tamanho = epi.tamanho || '-';
 
-      tr.innerHTML = `
-        <td>${nome}</td>
-        <td>${quantidade}</td>
-        <td>${categoria}</td>
-        <td>${tamanho}</td>
-        <td>
-          <div class="acoes-btns">
-            <button style="background:#f1c40f" onclick="alterarQuantidade('${epi.id}', 1)">+</button>
-            <button style="background:#f1c40f" onclick="alterarQuantidade('${epi.id}', -1)">−</button>
-            <button style="background:#3498db;color:#fff" onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">Editar</button>
-            <button style="background:#e74c3c;color:#fff" onclick="confirmarRemocao('${epi.id}')">Excluir</button>
-          </div>
 
-          <div class="acoes-mobile">
-            <div class="dropdown">
-              <button style="background:#34495e;color:#fff;padding:6px 12px;border-radius:4px;">Ações</button>
-              <div class="dropdown-content">
-                <button onclick="alterarQuantidade('${epi.id}', 1)">Adicionar</button>
-                <button onclick="alterarQuantidade('${epi.id}', -1)">Remover</button>
-                <button onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">Editar</button>
-                <button onclick="confirmarRemocao('${epi.id}')">Excluir</button>
-              </div>
-            </div>
-          </div>
-        </td>
-      `;
-      tabela.appendChild(tr);
-    }
 
-    window.editarEpi = async function(id, nome, quantidade, categoria, tamanho) {
-      const novoNome = prompt("Novo nome do EPI:", nome);
-      if (!novoNome) return;
+    
+ function adicionarLinhaNaTabela(epi) {
+  const tr = document.createElement('tr');
 
-      const novaQuantidade = prompt("Nova quantidade:", quantidade);
-      if (novaQuantidade === null) return;
+  const nome = epi.nome || 'N/A';
+  const quantidade = epi.quantidade ?? 'N/A';
+  const categoria = epi.categoria || 'N/A';
+  const tamanho = epi.tamanho || '-';
 
-      const novaCategoria = prompt("Nova categoria:", categoria);
-      if (!novaCategoria) return;
+  tr.innerHTML = `
+    <td>${nome}</td>
+    <td>${quantidade}</td>
+    <td>${categoria}</td>
+    <td>${tamanho}</td>
+    <td>
+      <button 
+        style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
+        onclick="alterarQuantidade('${epi.id}', 1)">
+        +
+      </button>
 
-      const novoTamanho = prompt("Novo tamanho:", tamanho);
-      if (novoTamanho === null) return;
+      <button 
+        style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
+        onclick="alterarQuantidade('${epi.id}', -1)">
+        −
+      </button>
+      
+      <button 
+        style="background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
+        onclick="editarEpi('${epi.id}', '${nome}', ${quantidade}, '${categoria}', '${tamanho}')">
+        Editar
+      </button>
 
-      const novoId = gerarIdEPI({ nome: novoNome, categoria: novaCategoria, tamanho: novoTamanho });
-      const epiRefAtual = ref(db, `estoque/${id}`);
-      const epiRefNovo = ref(db, `estoque/${novoId}`);
+      <button 
+        style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
+        onclick="confirmarRemocao('${epi.id}')">
+        Excluir
+      </button>
+    </td>
+  `;
+  tabela.appendChild(tr);
+}
 
-      if (id !== novoId) await remove(epiRefAtual);
+window.editarEpi = async function(id, nome, quantidade, categoria, tamanho) {
+  const novoNome = prompt("Novo nome do EPI:", nome);
+  if (!novoNome) return;
 
-      await set(epiRefNovo, {
-        nome: novoNome,
-        quantidade: parseInt(novaQuantidade),
-        categoria: novaCategoria,
-        tamanho: novoTamanho,
-        data: new Date().toISOString()
-      });
+  const novaQuantidade = prompt("Nova quantidade:", quantidade);
+  if (novaQuantidade === null) return;
 
-      carregarEstoque();
-    };
+  const novaCategoria = prompt("Nova categoria:", categoria);
+  if (!novaCategoria) return;
 
-    window.alterarQuantidade = async function(id, delta) {
-      const epiRef = ref(db, `estoque/${id}`);
-      const snapshot = await get(epiRef);
-      const epi = snapshot.val();
-      if (!epi) return;
+  const novoTamanho = prompt("Novo tamanho:", tamanho);
+  if (novoTamanho === null) return;
 
-      const novaQuantidade = (parseInt(epi.quantidade) || 0) + delta;
-      if (novaQuantidade < 0) return alert("Quantidade não pode ser negativa.");
+  const novoId = gerarIdEPI({ nome: novoNome, categoria: novaCategoria, tamanho: novoTamanho });
 
-      await update(epiRef, { quantidade: novaQuantidade });
-      carregarEstoque();
-    };
+  const epiRefAtual = ref(db, `estoque/${id}`);
+  const epiRefNovo = ref(db, `estoque/${novoId}`);
 
-    window.confirmarRemocao = function(id) {
-      if (confirm("Tem certeza que deseja excluir este EPI?")) {
-        removerEpi(id);
-      }
-    };
+  if (id !== novoId) await remove(epiRefAtual);
 
+  await set(epiRefNovo, {
+    nome: novoNome,
+    quantidade: parseInt(novaQuantidade),
+    categoria: novaCategoria,
+    tamanho: novoTamanho,
+    data: new Date().toISOString()
+  });
+
+  carregarEstoque();
+};
+
+window.alterarQuantidade = async function(id, delta) {
+  const epiRef = ref(db, `estoque/${id}`);
+  const snapshot = await get(epiRef);
+  const epi = snapshot.val();
+  if (!epi) return;
+
+  const novaQuantidade = (parseInt(epi.quantidade) || 0) + delta;
+  if (novaQuantidade < 0) return alert("Quantidade não pode ser negativa.");
+
+  await update(epiRef, { quantidade: novaQuantidade });
+  carregarEstoque();
+};
+
+window.confirmarRemocao = function(id) {
+  if (confirm("Tem certeza que deseja excluir este EPI?")) {
+    removerEpi(id);
+  }
+};
+
+
+    
+
+    
     async function adicionarOuSomarEPI(epi) {
       const id = gerarIdEPI(epi);
       const epiRef = ref(db, `estoque/${id}`);
+
       const snapshot = await get(epiRef);
       const existente = snapshot.val();
 
@@ -306,4 +232,5 @@
   </script>
 </body>
 </html>
+
 
