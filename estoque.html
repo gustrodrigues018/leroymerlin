@@ -40,11 +40,11 @@
     </tbody>
   </table>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+  <!-- Firebase SDKs (modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
       authDomain: "leroycontroll.firebaseapp.com",
@@ -55,8 +55,8 @@
       appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
     const tabela = document.querySelector('#tabelaEstoque tbody');
 
@@ -66,7 +66,8 @@
 
     async function carregarEstoque() {
       tabela.innerHTML = '';
-      const snapshot = await db.ref('estoque').once('value');
+      const estoqueRef = ref(db, 'estoque');
+      const snapshot = await get(estoqueRef);
       const dados = snapshot.val();
 
       if (dados) {
@@ -92,26 +93,27 @@
 
     async function adicionarOuSomarEPI(epi) {
       const id = gerarIdEPI(epi);
-      const ref = db.ref(`estoque/${id}`);
+      const epiRef = ref(db, `estoque/${id}`);
 
-      const snapshot = await ref.once('value');
+      const snapshot = await get(epiRef);
       const existente = snapshot.val();
 
       if (existente) {
-        await ref.update({
+        await update(epiRef, {
           quantidade: parseInt(existente.quantidade) + parseInt(epi.quantidade)
         });
       } else {
-        await ref.set(epi);
+        await set(epiRef, epi);
       }
 
       carregarEstoque();
     }
 
-    async function removerEpi(id) {
-      await db.ref(`estoque/${id}`).remove();
+    window.removerEpi = async function(id) {
+      const epiRef = ref(db, `estoque/${id}`);
+      await remove(epiRef);
       carregarEstoque();
-    }
+    };
 
     document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -145,3 +147,4 @@
   </script>
 </body>
 </html>
+
