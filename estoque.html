@@ -44,47 +44,47 @@
   </table>
 
   <!-- Firebase SDKs (modular) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
-      authDomain: "leroycontroll.firebaseapp.com",
-      databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
-      projectId: "leroycontroll",
-      storageBucket: "leroycontroll.appspot.com",
-      messagingSenderId: "6215288603",
-      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+    authDomain: "leroycontroll.firebaseapp.com",
+    databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
+    projectId: "leroycontroll",
+    storageBucket: "leroycontroll.appspot.com",
+    messagingSenderId: "6215288603",
+    appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth();
 
-    const tabela = document.querySelector('#tabelaEstoque tbody');
+  const tabela = document.querySelector('#tabelaEstoque tbody');
+  const formAdicionar = document.getElementById('formAdicionarEPI');
 
-    function gerarIdEPI(epi) {
-      return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
+  let usuarioAutorizado = false;
+
+  function gerarIdEPI(epi) {
+    return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
+  }
+
+  async function carregarEstoque() {
+    tabela.innerHTML = '';
+    const estoqueRef = ref(db, 'estoque');
+    const snapshot = await get(estoqueRef);
+    const dados = snapshot.val();
+
+    if (dados) {
+      Object.entries(dados).forEach(([id, epi]) => {
+        adicionarLinhaNaTabela({ id, ...epi });
+      });
     }
+  }
 
-    async function carregarEstoque() {
-      tabela.innerHTML = '';
-      const estoqueRef = ref(db, 'estoque');
-      const snapshot = await get(estoqueRef);
-      const dados = snapshot.val();
-
-      if (dados) {
-        Object.entries(dados).forEach(([id, epi]) => {
-          adicionarLinhaNaTabela({ id, ...epi });
-        });
-      }
-    }
-
-
-
-
-    
-   
   function adicionarLinhaNaTabela(epi) {
     const tr = document.createElement('tr');
 
@@ -93,39 +93,50 @@
     const categoria = epi.categoria || 'N/A';
     const tamanho = epi.tamanho || '-';
 
-    // Checar se está em modo mobile
+    if (!usuarioAutorizado) {
+      // Sem autorização, mostra só os dados, nada de ações
+      tr.innerHTML = `
+        <td>${nome}</td>
+        <td>${quantidade}</td>
+        <td>${categoria}</td>
+        <td>${tamanho}</td>
+        <td>–</td>
+      `;
+      tabela.appendChild(tr);
+      return;
+    }
+
+    // Se for mobile
     const isMobile = window.innerWidth < 768;
 
     let acoesHTML = '';
 
-   
-if (isMobile) {
-  acoesHTML = `
-    <div style="position: relative;">
-      <button onclick="toggleMenu(this)" style="background-color: #2ecc71; color: white; border: none; padding: 5px 8px; border-radius: 4px;">Ações</button>
-      <div class="menu-mobile" style="display: none; position: absolute; top: 30px; left: 0; background: white; border: 1px solid #ccc; z-index: 999; border-radius: 5px;">
-        <button onclick="alterarQuantidade('${epi.id}', 1)" style="display:block; width: 100%;">+ Adicionar</button>
-        <button onclick="alterarQuantidade('${epi.id}', -1)" style="display:block; width: 100%;">− Remover</button>
-        <a href="editar_epi.html?id=${encodeURIComponent(epi.id)}" style="display:block; width: 100%; padding: 6px 0; text-align:center; color:#3498db; text-decoration:none;">Editar</a>
-        <button onclick="confirmarRemocao('${epi.id}')" style="display:block; width: 100%; color: red;">Excluir</button>
-      </div>
-    </div>
-  `;
-} else {
-  acoesHTML = `
-    <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
-      onclick="alterarQuantidade('${epi.id}', 1)">+</button>
-    <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
-      onclick="alterarQuantidade('${epi.id}', -1)">−</button>
-  <button style="background-color: #3498db; color: white; border: none; padding: 5px 7px; border-radius: 4px; margin-right: 4px; cursor: pointer;"
-  onclick="window.location.href='editar_epi.html?id=${encodeURIComponent(epi.id)}'">
-  Editar
-</button>
-    </a>
-    <button style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
-      onclick="confirmarRemocao('${epi.id}')">Excluir</button>
-  `;
-}
+    if (isMobile) {
+      acoesHTML = `
+        <div style="position: relative;">
+          <button onclick="toggleMenu(this)" style="background-color: #2ecc71; color: white; border: none; padding: 5px 8px; border-radius: 4px;">Ações</button>
+          <div class="menu-mobile" style="display: none; position: absolute; top: 30px; left: 0; background: white; border: 1px solid #ccc; z-index: 999; border-radius: 5px;">
+            <button onclick="alterarQuantidade('${epi.id}', 1)" style="display:block; width: 100%;">+ Adicionar</button>
+            <button onclick="alterarQuantidade('${epi.id}', -1)" style="display:block; width: 100%;">− Remover</button>
+            <a href="editar_epi.html?id=${encodeURIComponent(epi.id)}" style="display:block; width: 100%; padding: 6px 0; text-align:center; color:#3498db; text-decoration:none;">Editar</a>
+            <button onclick="confirmarRemocao('${epi.id}')" style="display:block; width: 100%; color: red;">Excluir</button>
+          </div>
+        </div>
+      `;
+    } else {
+      acoesHTML = `
+        <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 2px;"
+          onclick="alterarQuantidade('${epi.id}', 1)">+</button>
+        <button style="background-color: #f1c40f; color: black; border: none; padding: 5px 8px; border-radius: 4px; margin-right: 4px;"
+          onclick="alterarQuantidade('${epi.id}', -1)">−</button>
+        <button style="background-color: #3498db; color: white; border: none; padding: 5px 7px; border-radius: 4px; margin-right: 4px; cursor: pointer;"
+          onclick="window.location.href='editar_epi.html?id=${encodeURIComponent(epi.id)}'">
+          Editar
+        </button>
+        <button style="background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 4px;"
+          onclick="confirmarRemocao('${epi.id}')">Excluir</button>
+      `;
+    }
 
     tr.innerHTML = `
       <td>${nome}</td>
@@ -142,108 +153,108 @@ if (isMobile) {
     const menu = btn.nextElementSibling;
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 
-    // Fechar outros menus
     document.querySelectorAll('.menu-mobile').forEach(m => {
       if (m !== menu) m.style.display = 'none';
     });
   };
 
-window.editarEpi = async function(id, nome, quantidade, categoria, tamanho) {
-  const novoNome = prompt("Novo nome do EPI:", nome);
-  if (!novoNome) return;
+  window.editarEpi = async function(id, nome, quantidade, categoria, tamanho) {
+    const novoNome = prompt("Novo nome do EPI:", nome);
+    if (!novoNome) return;
 
-  const novaQuantidade = prompt("Nova quantidade:", quantidade);
-  if (novaQuantidade === null) return;
+    const novaQuantidade = prompt("Nova quantidade:", quantidade);
+    if (novaQuantidade === null) return;
 
-  const novaCategoria = prompt("Nova categoria:", categoria);
-  if (!novaCategoria) return;
+    const novaCategoria = prompt("Nova categoria:", categoria);
+    if (!novaCategoria) return;
 
-  const novoTamanho = prompt("Novo tamanho:", tamanho);
-  if (novoTamanho === null) return;
+    const novoTamanho = prompt("Novo tamanho:", tamanho);
+    if (novoTamanho === null) return;
 
-  const novoId = gerarIdEPI({ nome: novoNome, categoria: novaCategoria, tamanho: novoTamanho });
+    const novoId = gerarIdEPI({ nome: novoNome, categoria: novaCategoria, tamanho: novoTamanho });
 
-  const epiRefAtual = ref(db, `estoque/${id}`);
-  const epiRefNovo = ref(db, `estoque/${novoId}`);
+    const epiRefAtual = ref(db, `estoque/${id}`);
+    const epiRefNovo = ref(db, `estoque/${novoId}`);
 
-  if (id !== novoId) await remove(epiRefAtual);
+    if (id !== novoId) await remove(epiRefAtual);
 
-  await set(epiRefNovo, {
-    nome: novoNome,
-    quantidade: parseInt(novaQuantidade),
-    categoria: novaCategoria,
-    tamanho: novoTamanho,
-    data: new Date().toISOString()
-  });
-
-  carregarEstoque();
-};
-
-window.alterarQuantidade = async function(id, delta) {
-  const epiRef = ref(db, `estoque/${id}`);
-  const snapshot = await get(epiRef);
-  const epi = snapshot.val();
-  if (!epi) return;
-
-  const novaQuantidade = (parseInt(epi.quantidade) || 0) + delta;
-  if (novaQuantidade < 0) return alert("Quantidade não pode ser negativa.");
-
-  await update(epiRef, { quantidade: novaQuantidade });
-  carregarEstoque();
-};
-
-window.confirmarRemocao = function(id) {
-  if (confirm("Tem certeza que deseja excluir este EPI?")) {
-    removerEpi(id);
-  }
-};
-
-
-
-
-
-    
-    async function adicionarOuSomarEPI(epi) {
-      const id = gerarIdEPI(epi);
-      const epiRef = ref(db, `estoque/${id}`);
-
-      const snapshot = await get(epiRef);
-      const existente = snapshot.val();
-
-      if (existente) {
-        await update(epiRef, {
-          quantidade: parseInt(existente.quantidade) + parseInt(epi.quantidade)
-        });
-      } else {
-        await set(epiRef, epi);
-      }
-
-      carregarEstoque();
-    }
-
-    window.removerEpi = async function(id) {
-      const epiRef = ref(db, `estoque/${id}`);
-      await remove(epiRef);
-      carregarEstoque();
-    };
-
-    document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const epi = {
-        nome: this.nome.value.trim(),
-        quantidade: parseInt(this.quantidade.value),
-        categoria: this.categoria.value.trim(),
-        tamanho: this.tamanho.value.trim() || '-',
-        data: new Date().toISOString()
-      };
-
-      adicionarOuSomarEPI(epi);
-      this.reset();
+    await set(epiRefNovo, {
+      nome: novoNome,
+      quantidade: parseInt(novaQuantidade),
+      categoria: novaCategoria,
+      tamanho: novoTamanho,
+      data: new Date().toISOString()
     });
 
-   document.querySelector('#buscaNome').addEventListener('input', function () {
-  const filtro = this.value.toLowerCase().trim();
-  const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
+    carregarEstoque();
+  };
+
+  window.alterarQuantidade = async function(id, delta) {
+    const epiRef = ref(db, `estoque/${id}`);
+    const snapshot = await get(epiRef);
+    const epi = snapshot.val();
+    if (!epi) return;
+
+    const novaQuantidade = (parseInt(epi.quantidade) || 0) + delta;
+    if (novaQuantidade < 0) return alert("Quantidade não pode ser negativa.");
+
+    await update(epiRef, { quantidade: novaQuantidade });
+    carregarEstoque();
+  };
+
+  window.confirmarRemocao = function(id) {
+    if (confirm("Tem certeza que deseja excluir este EPI?")) {
+      removerEpi(id);
+    }
+  };
+
+  async function adicionarOuSomarEPI(epi) {
+    const id = gerarIdEPI(epi);
+    const epiRef = ref(db, `estoque/${id}`);
+
+    const snapshot = await get(epiRef);
+    const existente = snapshot.val();
+
+    if (existente) {
+      await update(epiRef, {
+        quantidade: parseInt(existente.quantidade) + parseInt(epi.quantidade)
+      });
+    } else {
+      await set(epiRef, epi);
+    }
+
+    carregarEstoque();
+  }
+
+  window.removerEpi = async function(id) {
+    const epiRef = ref(db, `estoque/${id}`);
+    await remove(epiRef);
+    carregarEstoque();
+  };
+
+  formAdicionar.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (!usuarioAutorizado) {
+      alert('Você não tem permissão para adicionar EPIs.');
+      return;
+    }
+
+    const epi = {
+      nome: this.nome.value.trim(),
+      quantidade: parseInt(this.quantidade.value),
+      categoria: this.categoria.value.trim(),
+      tamanho: this.tamanho.value.trim() || '-',
+      data: new Date().toISOString()
+    };
+
+    adicionarOuSomarEPI(epi);
+    this.reset();
+  });
+
+  document.querySelector('#buscaNome').addEventListener('input', function () {
+    const filtro = this.value.toLowerCase().trim();
+    const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
 
   linhas.forEach(linha => {
     const nome = linha.cells[0].textContent.toLowerCase();
