@@ -31,6 +31,113 @@
       border: none;
       cursor: pointer;
     }
+    :root {
+  --azul-escuro: #001F3F;
+  --azul-claro: #1976d2;
+  --branco: #ffffff;
+  --cinza-claro: #f4f6f8;
+  --sombra: rgba(0, 0, 0, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--cinza-claro);
+  color: var(--azul-escuro);
+  margin: 0;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.4rem;
+  margin-bottom: 30px;
+  color: var(--azul-escuro);
+  text-shadow: 0 0 5px var(--azul-claro);
+}
+
+.perfil {
+  background: var(--branco);
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px var(--sombra);
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.foto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--azul-claro);
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+  flex-shrink: 0;
+}
+
+.info p {
+  font-size: 1.1rem;
+  margin: 8px 0;
+}
+
+.info strong {
+  color: var(--azul-claro);
+}
+
+button {
+  margin-top: 30px;
+  padding: 12px 30px;
+  background: var(--azul-escuro);
+  color: var(--branco);
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 31, 63, 0.4);
+}
+
+button:hover {
+  background: #003366;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 20px 10px;
+  }
+
+  .perfil {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .foto {
+    width: 100px;
+    height: 100px;
+    border-width: 2px;
+  }
+
+  .info p {
+    font-size: 1rem;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+  }
+}
+
   </style>
 </head>
 <body>
