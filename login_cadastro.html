@@ -254,11 +254,13 @@
         // Se quiser salvar nome no Firestore, pode fazer aqui (diz se quiser)
         statusCadastro.style.color = "green";
         statusCadastro.innerText = "Cadastro realizado com sucesso! Feche o modal e faça login.";
+        
         // Limpa formulário
         e.target.reset();
         // Fecha modal automático depois de 2s
         setTimeout(() => {
           modal.style.display = "none";
+        window.location.href = "usuario.html";
         }, 2000);
       } catch (error) {
         statusCadastro.innerText = "Erro: " + error.message;
