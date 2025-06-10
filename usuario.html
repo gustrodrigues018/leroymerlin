@@ -1,187 +1,160 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Painel do Usuário</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+    :root {
+      --azul-escuro: #001F3F;
+      --azul-claro: #1976d2;
+      --branco: #ffffff;
+      --cinza-claro: #f4f6f8;
+      --sombra: rgba(0, 0, 0, 0.15);
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--azul-escuro); /* fundo azul escuro */
+      color: var(--branco); /* texto branco */
+      margin: 0;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 30px;
+      color: var(--branco); /* título branco */
+      text-shadow: 0 0 5px var(--azul-claro);
+    }
+
     .perfil {
+      background: #0a2a5b; /* azul mais claro para destacar */
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 30px;
+      max-width: 600px;
+      width: 100%;
     }
+
     .foto {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #333;
+      border: 3px solid var(--azul-claro);
+      box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+      flex-shrink: 0;
     }
-    .info {
-      font-size: 18px;
+
+    .info p {
+      font-size: 1.1rem;
+      margin: 8px 0;
+      color: var(--branco); /* texto branco dentro do perfil */
     }
+
+    .info strong {
+      color: var(--azul-claro);
+    }
+
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #d32f2f;
-      color: white;
+      margin-top: 30px;
+      padding: 12px 30px;
+      background: var(--azul-claro);
+      color: var(--branco);
       border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.6);
     }
-    :root {
-  --azul-escuro: #001F3F;
-  --azul-claro: #1976d2;
-  --branco: #ffffff;
-  --cinza-claro: #f4f6f8;
-  --sombra: rgba(0, 0, 0, 0.15);
-}
 
-* {
-  box-sizing: border-box;
-}
+    button:hover {
+      background: #005bb5;
+    }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--cinza-claro);
-  color: var(--azul-escuro);
-  margin: 0;
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-}
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 10px;
+      }
 
-h1 {
-  font-size: 2.4rem;
-  margin-bottom: 30px;
-  color: var(--azul-escuro);
-  text-shadow: 0 0 5px var(--azul-claro);
-}
+      .perfil {
+        flex-direction: column;
+        padding: 20px;
+        gap: 20px;
+      }
 
-.perfil {
-  background: var(--branco);
-  padding: 30px 40px;
-  border-radius: 15px;
-  box-shadow: 0 8px 16px var(--sombra);
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  max-width: 600px;
-  width: 100%;
-}
+      .foto {
+        width: 100px;
+        height: 100px;
+        border-width: 2px;
+      }
 
-.foto {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--azul-claro);
-  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
-  flex-shrink: 0;
-}
+      .info p {
+        font-size: 1rem;
+      }
 
-.info p {
-  font-size: 1.1rem;
-  margin: 8px 0;
-}
-
-.info strong {
-  color: var(--azul-claro);
-}
-
-button {
-  margin-top: 30px;
-  padding: 12px 30px;
-  background: var(--azul-escuro);
-  color: var(--branco);
-  border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 31, 63, 0.4);
-}
-
-button:hover {
-  background: #003366;
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 20px 10px;
-  }
-
-  .perfil {
-    flex-direction: column;
-    padding: 20px;
-    gap: 20px;
-  }
-
-  .foto {
-    width: 100px;
-    height: 100px;
-    border-width: 2px;
-  }
-
-  .info p {
-    font-size: 1rem;
-  }
-
-  button {
-    width: 100%;
-    padding: 14px;
-  }
-}
+      button {
+        width: 100%;
+        padding: 14px;
+      }
+    }
 
     #menu-transparente {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.3); /* transparente, mas escuro */
-  padding: 8px 15px;
-  border-radius: 8px;
-  z-index: 1000;
-  backdrop-filter: blur(6px); /* efeito blur atrás */
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  transition: background 0.3s ease;
-}
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px 15px;
+      border-radius: 8px;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s ease;
+    }
 
-#menu-transparente a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
+    #menu-transparente a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
 
-#menu-transparente a:hover {
-  color: #f1c40f;
-  text-decoration: underline;
-}
+    #menu-transparente a:hover {
+      color: #f1c40f;
+      text-decoration: underline;
+    }
 
-#menu-transparente:hover {
-  background: rgba(0, 0, 0, 0.6);
-  cursor: pointer;
-}
-
+    #menu-transparente:hover {
+      background: rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+    }
   </style>
 </head>
-  
+
 <body>
-<nav id="menu-transparente">
-  <a href="estoque.html">Estoque</a>
-</nav>
-  
+  <nav id="menu-transparente">
+    <a href="estoque.html">Estoque</a>
+  </nav>
+
   <h1>👤 Perfil do Usuário</h1>
-  
+
   <div class="perfil">
-    <img id="foto" class="foto" src="https://via.placeholder.com/100" alt="Foto de perfil">
+    <img id="foto" class="foto" src="https://via.placeholder.com/100" alt="Foto de perfil" />
     <div class="info">
       <p><strong>Nome:</strong> <span id="nome">Carregando...</span></p>
       <p><strong>Email:</strong> <span id="email">Carregando...</span></p>
@@ -203,7 +176,7 @@ button:hover {
       projectId: "leroycontroll",
       storageBucket: "leroycontroll.appspot.com",
       messagingSenderId: "6215288603",
-      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
+      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be",
     };
 
     const app = initializeApp(firebaseConfig);
