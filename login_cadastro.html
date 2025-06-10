@@ -13,7 +13,7 @@
     <button type="submit">Entrar</button>
   </form>
 
-  <button onclick="cadastrar()">Cadastrar</button>
+<button id="btnCadastrar" onclick="cadastrar()">Cadastrar</button>
 
   <div id="status"></div>
 
@@ -57,13 +57,14 @@
       const email = document.getElementById("email").value;
       const senha = document.getElementById("senha").value;
 
-      try {
-        await createUserWithEmailAndPassword(auth, email, senha);
-        status.innerText = "✅ Usuário cadastrado!";
-      } catch (error) {
-        status.innerText = "❌ Erro no cadastro: " + error.message;
-      }
-    };
+    try {
+  await signInWithEmailAndPassword(auth, email, senha);
+  status.innerText = "✅ Logado com sucesso!";
+  window.location.href = "usuario.html"; // REDIRECIONA PRA PÁGINA DO USUÁRIO
+} catch (error) {
+  status.innerText = "❌ Erro no login: " + error.message;
+}
+
 
     // Monitorar login
     onAuthStateChanged(auth, (user) => {
