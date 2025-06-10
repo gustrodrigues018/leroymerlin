@@ -189,19 +189,16 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    const inputFoto = document.getElementById("inputFoto");
-const fotoElement = document.getElementById("foto");
-
-inputFoto.addEventListener("change", (event) => {
+   inputFoto.addEventListener("change", async (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    fotoElement.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-});
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Você precisa estar logado para alterar a foto.");
+    return;
+  }
+
   try {
     // Cria referência no Storage para foto do usuário (exemplo: usuarios/uid/perfil.jpg)
     const fotoRef = ref(storage, `usuarios/${user.uid}/perfil.jpg`);
