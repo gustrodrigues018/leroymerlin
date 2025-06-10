@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Usuário</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .perfil {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .foto {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #333;
+    }
+    .info {
+      font-size: 18px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #d32f2f;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>👤 Perfil do Usuário</h1>
+  <div class="perfil">
+    <img id="foto" class="foto" src="https://via.placeholder.com/100" alt="Foto de perfil">
+    <div class="info">
+      <p><strong>Nome:</strong> <span id="nome">Carregando...</span></p>
+      <p><strong>Email:</strong> <span id="email">Carregando...</span></p>
+      <p><strong>Nível:</strong> <span id="nivel">Carregando...</span></p>
+    </div>
+  </div>
+
+  <button onclick="sair()">Sair</button>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+      authDomain: "leroycontroll.firebaseapp.com",
+      projectId: "leroycontroll",
+      storageBucket: "leroycontroll.appspot.com",
+      messagingSenderId: "6215288603",
+      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById("email").textContent = user.email;
+
+        const docRef = doc(db, "usuarios", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const dados = docSnap.data();
+          document.getElementById("nome").textContent = dados.nome || "Sem nome";
+          document.getElementById("nivel").textContent = dados.nivel || "comum";
+          if (dados.fotoUrl) {
+            document.getElementById("foto").src = dados.fotoUrl;
+          }
+        } else {
+          alert("Usuário não possui dados extras no Firestore.");
+        }
+      } else {
+        window.location.href = "index.html"; // volta pro login
+      }
+    });
+
+    window.sair = async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    };
+  </script>
+</body>
+</html>
