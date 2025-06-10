@@ -171,3 +171,38 @@ td button:hover {
   background-color: var(--branco);
   color: var(--azul-escuro);
 }
+
+
+
+
+#menu-transparente {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.3); /* transparente, mas escuro */
+  padding: 8px 15px;
+  border-radius: 8px;
+  z-index: 1000;
+  backdrop-filter: blur(6px); /* efeito blur atrás */
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  transition: background 0.3s ease;
+}
+
+#menu-transparente a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+#menu-transparente a:hover {
+  color: #f1c40f;
+  text-decoration: underline;
+}
+
+#menu-transparente:hover {
+  background: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
