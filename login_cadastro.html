@@ -224,22 +224,21 @@
 
     // Login
     document.getElementById("formAuth").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const senha = document.getElementById("senha").value;
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
 
-      try {
-        await signInWithEmailAndPassword(auth, email, senha);
-        status.style.color = "lightgreen";
-        status.innerText = "✅ Logado com sucesso!";
-        // redirecione aqui se quiser, ex:
-        // window.location.href = "usuario.html";
-      } catch (error) {
-        status.style.color = "#ffdddd";
-        status.innerText = "❌ Erro no login: " + error.message;
-      }
-    });
-
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+    status.style.color = "lightgreen";
+    status.innerText = "✅ Logado com sucesso!";
+    // redireciona pra página de usuário
+    window.location.href = "usuario.html";
+  } catch (error) {
+    status.style.color = "#ffdddd";
+    status.innerText = "❌ Erro no login: " + error.message;
+  }
+});
     // Cadastro
     document.getElementById("formCadastro").addEventListener("submit", async (e) => {
       e.preventDefault();
