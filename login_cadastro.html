@@ -230,7 +230,7 @@
       await signInWithEmailAndPassword(auth, email, senha);
       status.style.color = "lightgreen";
       status.innerText = "✅ Logado com sucesso!";
-      window.location.href = "usuario.html";
+      window.location.href = "estoque.html";
     } catch (error) {
       status.style.color = "#ffdddd";
       status.innerText = "❌ Erro no login: " + error.message;
@@ -265,7 +265,7 @@
       e.target.reset();
       setTimeout(() => {
         modal.style.display = "none";
-        window.location.href = "usuario.html";
+        window.location.href = "estoque.html";
       }, 2000);
     } catch (error) {
       statusCadastro.innerText = "Erro: " + error.message;
