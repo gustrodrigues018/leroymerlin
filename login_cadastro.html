@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Login de Usuários</title>
+</head>
+<body>
+  <h1>Login / Cadastro</h1>
+
+  <form id="formAuth">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="senha" placeholder="Senha" required>
+    <button type="submit">Entrar</button>
+  </form>
+
+  <button onclick="cadastrar()">Cadastrar</button>
+
+  <div id="status"></div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+      authDomain: "leroycontroll.firebaseapp.com",
+      projectId: "leroycontroll",
+      storageBucket: "leroycontroll.appspot.com",
+      messagingSenderId: "6215288603",
+      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const status = document.getElementById("status");
+
+    // Login
+    document.getElementById("formAuth").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+        status.innerText = "✅ Logado com sucesso!";
+        // Redireciona se quiser:
+        // window.location.href = "painel.html";
+      } catch (error) {
+        status.innerText = "❌ Erro no login: " + error.message;
+      }
+    });
+
+    // Cadastro
+    window.cadastrar = async () => {
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, senha);
+        status.innerText = "✅ Usuário cadastrado!";
+      } catch (error) {
+        status.innerText = "❌ Erro no cadastro: " + error.message;
+      }
+    };
+
+    // Monitorar login
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        status.innerText = `🔓 Logado como: ${user.email}`;
+      } else {
+        console.log("Usuário deslogado");
+      }
+    });
+  </script>
+</body>
+</html>
