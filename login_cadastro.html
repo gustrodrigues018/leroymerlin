@@ -74,5 +74,123 @@
       }
     });
   </script>
+  <style>
+    :root {
+  --azul-escuro: #001F3F;
+  --azul-claro: #1976d2;
+  --azul-medio: #ffffff;
+  --branco: #ffffff;
+  --sombra: rgba(0, 0, 0, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--azul-escuro);
+  color: var(--branco);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 40px;
+  font-size: 2.8rem;
+  text-shadow: 0 0 10px var(--azul-claro);
+}
+
+form {
+  background: var(--azul-claro);
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px var(--sombra);
+  width: 100%;
+  max-width: 400px;
+  color: var(--azul-escuro);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+input[type="email"],
+input[type="password"] {
+  padding: 14px 18px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  box-shadow: 0 0 8px var(--azul-escuro);
+}
+
+button[type="submit"] {
+  background: var(--azul-escuro);
+  color: var(--branco);
+  padding: 15px 0;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background: #003366;
+}
+
+button#btnCadastrar {
+  margin-top: 20px;
+  background: transparent;
+  border: 2px solid var(--branco);
+  color: var(--branco);
+  padding: 12px 0;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+button#btnCadastrar:hover {
+  background: var(--branco);
+  color: var(--azul-escuro);
+}
+
+#status {
+  margin-top: 25px;
+  min-height: 24px;
+  font-weight: 600;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  color: #ffdddd;
+  text-shadow: 0 0 3px #aa0000;
+}
+
+@media (max-width: 450px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  form, button#btnCadastrar {
+    padding: 25px 20px;
+  }
+}
+
+    <style/>
 </body>
 </html>
