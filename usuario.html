@@ -192,16 +192,16 @@
     const inputFoto = document.getElementById("inputFoto");
 const fotoElement = document.getElementById("foto");
 
-inputFoto.addEventListener("change", async (event) => {
+inputFoto.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Você precisa estar logado para alterar a foto.");
-    return;
-  }
-
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    fotoElement.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+});
   try {
     // Cria referência no Storage para foto do usuário (exemplo: usuarios/uid/perfil.jpg)
     const fotoRef = ref(storage, `usuarios/${user.uid}/perfil.jpg`);
