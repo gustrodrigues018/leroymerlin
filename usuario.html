@@ -153,19 +153,24 @@
 
   <h1>👤 Perfil do Usuário</h1>
 
-  <div class="perfil">
-    <img id="foto" class="foto" src="https://via.placeholder.com/100" alt="Foto de perfil" />
-    <div class="info">
-      <p><strong>Nome:</strong> <span id="nome">Carregando...</span></p>
-      <p><strong>Email:</strong> <span id="email">Carregando...</span></p>
-      <p><strong>Nível:</strong> <span id="nivel">Carregando...</span></p>
-    </div>
+ <div class="perfil">
+  <img id="foto" class="foto" src="https://via.placeholder.com/100" alt="Foto de perfil">
+  <label for="inputFoto" style="cursor:pointer; color: var(--azul-claro); text-decoration: underline; margin-top: 8px; display: inline-block;">
+    Alterar foto
+  </label>
+  <input type="file" id="inputFoto" accept="image/*" style="display:none" />
+  <div class="info">
+    <p><strong>Nome:</strong> <span id="nome">Carregando...</span></p>
+    <p><strong>Email:</strong> <span id="email">Carregando...</span></p>
+    <p><strong>Nível:</strong> <span id="nivel">Carregando...</span></p>
   </div>
+</div>
 
   <button onclick="sair()">Sair</button>
 
   <!-- Firebase SDKs -->
   <script type="module">
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -182,6 +187,46 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const inputFoto = document.getElementById("inputFoto");
+const fotoElement = document.getElementById("foto");
+
+inputFoto.addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Você precisa estar logado para alterar a foto.");
+    return;
+  }
+
+  try {
+    // Cria referência no Storage para foto do usuário (exemplo: usuarios/uid/perfil.jpg)
+    const fotoRef = ref(storage, `usuarios/${user.uid}/perfil.jpg`);
+
+    // Faz upload do arquivo
+    await uploadBytes(fotoRef, file);
+
+    // Pega URL pública da foto
+    const url = await getDownloadURL(fotoRef);
+
+    // Atualiza foto na interface
+    fotoElement.src = url;
+
+    // Atualiza a URL da foto no Firestore (documento do usuário)
+    const docRef = doc(db, "usuarios", user.uid);
+    await setDoc(docRef, { fotoUrl: url }, { merge: true });
+
+    alert("Foto atualizada com sucesso!");
+
+  } catch (error) {
+    console.error("Erro ao enviar foto:", error);
+    alert("Erro ao enviar foto. Tente novamente.");
+  }
+});
+
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
