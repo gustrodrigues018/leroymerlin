@@ -47,7 +47,20 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+const auth = getAuth(app);
+
+window.sair = function () {
+  signOut(auth)
+    .then(() => {
+      window.location.href = "index.html"; // ou login.html, como preferir
+    })
+    .catch((error) => {
+      alert("Erro ao sair: " + error.message);
+    });
+};
+    
     const firebaseConfig = {
       apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
       authDomain: "leroycontroll.firebaseapp.com",
