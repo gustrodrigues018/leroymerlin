@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatórios de Ações</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+    table { width: 100%; border-collapse: collapse; background: white; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #3498db; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Relatórios de Ações no Sistema</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Usuário</th>
+        <th>Ação</th>
+        <th>EPI</th>
+        <th>Categoria</th>
+        <th>Tamanho</th>
+        <th>Alteração</th>
+        <th>Data/Hora</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaRelatorios">
+    </tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+      authDomain: "leroycontroll.firebaseapp.com",
+      databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
+      projectId: "leroycontroll",
+      storageBucket: "leroycontroll.appspot.com",
+      messagingSenderId: "6215288603",
+      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const tbody = document.getElementById("tabelaRelatorios");
+
+    async function carregarRelatorios() {
+      const refRelatorios = ref(db, 'relatorios');
+      const snapshot = await get(refRelatorios);
+      const dados = snapshot.val();
+
+      if (dados) {
+        Object.values(dados).reverse().forEach(acao => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${acao.usuario}</td>
+            <td>${acao.tipoAcao}</td>
+            <td>${acao.nomeEPI}</td>
+            <td>${acao.categoria}</td>
+            <td>${acao.tamanho}</td>
+            <td>${acao.alteracao > 0 ? '+' : ''}${acao.alteracao}</td>
+            <td>${new Date(acao.dataHora).toLocaleString('pt-BR')}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    carregarRelatorios();
+  </script>
+</body>
+</html>
