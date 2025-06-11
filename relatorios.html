@@ -3,21 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <title>Relatórios de Ações</title>
-  <style>
-    body { font-family: Arial; padding: 20px; background: #f5f5f5; }
-    table { width: 100%; border-collapse: collapse; background: white; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #3498db; color: white; }
-    .centralizado { margin: 15px 0; text-align: center; }
-    #buscaRelatorios {
-      width: 100%;
-      max-width: 400px;
-      padding: 8px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-  </style>
+<style>
+  :root {
+    --azul-escuro: #001F3F;
+    --azul-claro: #64b5f6;
+    --azul-hover: #1565c0;
+    --azul-extra-claro: #e3f2fd;
+    --branco: #ffffff;
+    --cinza-claro: #f5f5f5;
+    --sombra: rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background-color: var(--azul-escuro);
+    color: var(--branco);
+    text-transform: uppercase;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    color: var(--branco);
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+
+  .centralizado {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  #buscaRelatorios {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--azul-claro);
+    background-color: var(--branco);
+    color: var(--azul-escuro);
+    transition: border-color 0.3s ease;
+  }
+
+  #buscaRelatorios:focus {
+    border-color: var(--azul-hover);
+    outline: none;
+  }
+
+  table {
+    width: 90%;
+    margin: 0 auto 30px auto;
+    border-collapse: collapse;
+    background-color: var(--branco);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px var(--sombra);
+    color: var(--azul-escuro);
+  }
+
+  th {
+    background-color: var(--azul-claro);
+    color: var(--azul-escuro);
+    padding: 12px;
+    text-align: center;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    color: var(--azul-escuro);
+  }
+
+  tr:nth-child(even) {
+    background-color: var(--azul-extra-claro);
+  }
+
+  tr:hover {
+    background-color: var(--azul-claro);
+    color: var(--branco);
+  }
+</style>
+
 </head>
 <body>
   <h1>Relatórios de Ações no Sistema</h1>
