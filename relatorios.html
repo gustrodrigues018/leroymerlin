@@ -8,10 +8,24 @@
     table { width: 100%; border-collapse: collapse; background: white; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background-color: #3498db; color: white; }
+    .centralizado { margin: 15px 0; text-align: center; }
+    #buscaRelatorios {
+      width: 100%;
+      max-width: 400px;
+      padding: 8px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
   <h1>Relatórios de Ações no Sistema</h1>
+
+  <div class="centralizado">
+    <input type="text" id="buscaRelatorios" placeholder="Filtrar relatórios..." />
+  </div>
+
   <table>
     <thead>
       <tr>
@@ -46,28 +60,55 @@
     const db = getDatabase(app);
 
     const tbody = document.getElementById("tabelaRelatorios");
+    const buscaInput = document.getElementById("buscaRelatorios");
+
+    let relatoriosCache = []; // guarda os dados para o filtro local
 
     async function carregarRelatorios() {
       const refRelatorios = ref(db, 'relatorios');
       const snapshot = await get(refRelatorios);
       const dados = snapshot.val();
 
-      if (dados) {
-        Object.values(dados).reverse().forEach(acao => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${acao.usuario}</td>
-            <td>${acao.tipoAcao}</td>
-            <td>${acao.nomeEPI}</td>
-            <td>${acao.categoria}</td>
-            <td>${acao.tamanho}</td>
-            <td>${acao.alteracao > 0 ? '+' : ''}${acao.alteracao}</td>
-            <td>${new Date(acao.dataHora).toLocaleString('pt-BR')}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
+      relatoriosCache = dados ? Object.values(dados).reverse() : [];
+      renderizarRelatorios(relatoriosCache);
     }
+
+    function renderizarRelatorios(dados) {
+      tbody.innerHTML = '';
+      dados.forEach(acao => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${acao.usuario}</td>
+          <td>${acao.tipoAcao}</td>
+          <td>${acao.nomeEPI}</td>
+          <td>${acao.categoria}</td>
+          <td>${acao.tamanho}</td>
+          <td>${acao.alteracao > 0 ? '+' : ''}${acao.alteracao}</td>
+          <td>${new Date(acao.dataHora).toLocaleString('pt-BR')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    buscaInput.addEventListener('input', () => {
+      const filtro = buscaInput.value.toLowerCase();
+      if (!filtro) {
+        renderizarRelatorios(relatoriosCache);
+        return;
+      }
+      const filtrados = relatoriosCache.filter(acao => {
+        return (
+          (acao.usuario && acao.usuario.toLowerCase().includes(filtro)) ||
+          (acao.tipoAcao && acao.tipoAcao.toLowerCase().includes(filtro)) ||
+          (acao.nomeEPI && acao.nomeEPI.toLowerCase().includes(filtro)) ||
+          (acao.categoria && acao.categoria.toLowerCase().includes(filtro)) ||
+          (acao.tamanho && acao.tamanho.toLowerCase().includes(filtro)) ||
+          (acao.alteracao && String(acao.alteracao).includes(filtro)) ||
+          (acao.dataHora && new Date(acao.dataHora).toLocaleString('pt-BR').toLowerCase().includes(filtro))
+        );
+      });
+      renderizarRelatorios(filtrados);
+    });
 
     carregarRelatorios();
   </script>
