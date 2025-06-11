@@ -259,10 +259,15 @@ inputFoto.addEventListener("change", async (event) => {
 });
 
 // Logout
-window.sair = async () => {
-  await signOut(auth);
-  window.location.href = "index.html";
-};
+document.getElementById('btnSair').addEventListener('click', async () => {
+  try {
+    await signOut(auth);
+    window.location.href = "index.html";
+  } catch (error) {
+    alert("Erro ao sair: " + error.message);
+  }
+});
+
 </script>
 
 </body>
