@@ -3,126 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <title>Painel do Usuário</title>
-  <style>
-    :root {
-      --azul-escuro: #001F3F;
-      --azul-claro: #1976d2;
-      --branco: #ffffff;
-      --cinza-claro: #f4f6f8;
-      --sombra: rgba(0, 0, 0, 0.15);
-    }
+ <style>
+  :root {
+    --azul-escuro: #001F3F;
+    --azul-claro: #1976d2;
+    --branco: #ffffff;
+    --cinza-claro: #f4f6f8;
+    --sombra: rgba(0, 0, 0, 0.15);
+  }
 
-    * {
-      box-sizing: border-box;
-    }
+  * {
+    box-sizing: border-box;
+  }
 
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--azul-escuro);
+    color: var(--branco);
+    margin: 0;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    margin-bottom: 30px;
+    color: var(--branco);
+    text-shadow: 0 0 5px var(--azul-claro);
+  }
+
+  .perfil {
+    background: #0a2a5b;
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .info p {
+    font-size: 1.1rem;
+    margin: 8px 0;
+    color: var(--branco);
+  }
+
+  .info strong {
+    color: var(--azul-claro);
+  }
+
+  button {
+    margin-top: 30px;
+    padding: 12px 30px;
+    background: var(--azul-claro);
+    color: var(--branco);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.6);
+  }
+
+  button:hover {
+    background: #005bb5;
+  }
+
+  @media (max-width: 480px) {
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--azul-escuro);
-      color: var(--branco);
-      margin: 0;
-      padding: 30px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    h1 {
-      font-size: 2.4rem;
-      margin-bottom: 30px;
-      color: var(--branco);
-      text-shadow: 0 0 5px var(--azul-claro);
+      padding: 20px 10px;
     }
 
     .perfil {
-      background: #0a2a5b;
-      padding: 30px 40px;
-      border-radius: 15px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-      max-width: 600px;
-      width: 100%;
+      padding: 20px;
     }
 
     .info p {
-      font-size: 1.1rem;
-      margin: 8px 0;
-      color: var(--branco);
-    }
-
-    .info strong {
-      color: var(--azul-claro);
+      font-size: 1rem;
     }
 
     button {
-      margin-top: 30px;
-      padding: 12px 30px;
-      background: var(--azul-claro);
-      color: var(--branco);
-      border: none;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.6);
+      width: 100%;
+      padding: 14px;
     }
+  }
 
-    button:hover {
-      background: #005bb5;
-    }
+  #menu-transparente {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 15px;
+    border-radius: 8px;
+    z-index: 1000;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+  }
 
-    @media (max-width: 480px) {
-      body {
-        padding: 20px 10px;
-      }
+  #menu-transparente a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  }
 
-      .perfil {
-        padding: 20px;
-      }
+  #menu-transparente a:hover {
+    color: #f1c40f;
+    text-decoration: underline;
+  }
 
-      .info p {
-        font-size: 1rem;
-      }
-
-      button {
-        width: 100%;
-        padding: 14px;
-      }
-    }
-
-    #menu-transparente {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 8px 15px;
-      border-radius: 8px;
-      z-index: 1000;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      transition: background 0.3s ease;
-    }
-
-    #menu-transparente a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-    }
-
-    #menu-transparente a:hover {
-      color: #f1c40f;
-      text-decoration: underline;
-    }
-
-    #menu-transparente:hover {
-      background: rgba(0, 0, 0, 0.6);
-      cursor: pointer;
-    }
-  </style>
+  #menu-transparente:hover {
+    background: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+  }
+</style>
 </head>
 
 <body>
@@ -142,6 +142,7 @@
 
   <button id="btnSair">Sair</button>
 
+  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -174,7 +175,14 @@
       if (docSnap.exists()) {
         const dados = docSnap.data();
         document.getElementById("nome").textContent = dados.nome || "Sem nome";
-        document.getElementById("nivel").textContent = dados.nivel || "comum";
+
+        // Controle do nível: se for seu UID, mostra admin, senão pega do Firestore
+        if (user.uid === '7PUWZ9lCu2UN4s8IOrsPgJU64wF3') {
+          document.getElementById("nivel").textContent = "admin";
+        } else {
+          document.getElementById("nivel").textContent = dados.nivel || "comum";
+        }
+
       } else {
         alert("Usuário não possui dados extras no Firestore.");
       }
@@ -189,5 +197,6 @@
       }
     });
   </script>
+
 </body>
 </html>
