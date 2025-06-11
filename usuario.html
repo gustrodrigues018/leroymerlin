@@ -174,7 +174,7 @@
 
   <button onclick="sair()">Sair</button>
   <!-- Firebase SDKs -->
-  <script type="module">
+<script type="module">
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -190,13 +190,13 @@ const firebaseConfig = {
   appId: "1:6215288603:web:b8c8882a4a22a396a5f5be",
 };
 
-// Inicializações
+// Inicializa o app, auth, firestore e storage
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// Escuta o login do usuário
+// Escuta o estado de autenticação do usuário
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -221,17 +221,17 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // ===============================
-// UPLOAD DE FOTO DE PERFIL
+// UPLOAD DA FOTO DE PERFIL
 // ===============================
 const inputFoto = document.getElementById("inputFoto");
 const fotoElement = document.getElementById("foto");
 
-// Clique na imagem dispara o input
+// Clique na imagem abre o seletor de arquivo
 fotoElement.addEventListener("click", () => {
   inputFoto.click();
 });
 
-// Upload da nova foto
+// Upload da nova foto selecionada
 inputFoto.addEventListener("change", async (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -263,7 +263,7 @@ window.sair = async () => {
   await signOut(auth);
   window.location.href = "index.html";
 };
+</script>
 
-  </script>
 </body>
 </html>
