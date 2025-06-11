@@ -44,9 +44,9 @@
   </table>
 
   <!-- Firebase SDKs (modular) -->
- <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, get, set, update, remove, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -77,6 +77,23 @@
 
   function gerarIdEPI(epi) {
     return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
+  }
+
+  async function registrarAcao(tipoAcao, epi, delta = 0) {
+    const user = auth.currentUser;
+    const usuario = user ? (user.displayName || user.email) : "Desconhecido";
+    const relatoriosRef = ref(db, 'relatorios');
+    const registro = {
+      usuario,
+      tipoAcao,
+      nomeEPI: epi.nome,
+      categoria: epi.categoria,
+      tamanho: epi.tamanho || '-',
+      quantidade: epi.quantidade ?? 0,
+      alteracao: delta,
+      dataHora: new Date().toISOString()
+    };
+    await push(relatoriosRef, registro);
   }
 
   async function carregarEstoque() {
@@ -168,13 +185,17 @@
 
     if (id !== novoId) await remove(epiRefAtual);
 
-    await set(epiRefNovo, {
+    const epiAtualizado = {
       nome: novoNome,
       quantidade: parseInt(novaQuantidade),
       categoria: novaCategoria,
       tamanho: novoTamanho,
       data: new Date().toISOString()
-    });
+    };
+
+    await set(epiRefNovo, epiAtualizado);
+
+    await registrarAcao('Edição', epiAtualizado, parseInt(novaQuantidade));
 
     carregarEstoque();
   };
@@ -189,6 +210,9 @@
     if (novaQuantidade < 0) return alert("Quantidade não pode ser negativa.");
 
     await update(epiRef, { quantidade: novaQuantidade });
+    
+    await registrarAcao(delta > 0 ? 'Adição' : 'Remoção', epi, delta);
+
     carregarEstoque();
   };
 
@@ -205,11 +229,12 @@
     const existente = snapshot.val();
 
     if (existente) {
-      await update(epiRef, {
-        quantidade: parseInt(existente.quantidade) + parseInt(epi.quantidade)
-      });
+      const novaQuantidade = parseInt(existente.quantidade) + parseInt(epi.quantidade);
+      await update(epiRef, { quantidade: novaQuantidade });
+      await registrarAcao('Adição', { ...epi, quantidade: novaQuantidade }, parseInt(epi.quantidade));
     } else {
       await set(epiRef, epi);
+      await registrarAcao('Cadastro', epi, parseInt(epi.quantidade));
     }
 
     carregarEstoque();
@@ -217,50 +242,8 @@
 
   window.removerEpi = async function(id) {
     const epiRef = ref(db, `estoque/${id}`);
-    await remove(epiRef);
-    carregarEstoque();
-  };
+    const snapshot = await get(epi
 
-  document.querySelector('#formAdicionarEPI').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const epi = {
-      nome: this.nome.value.trim(),
-      quantidade: parseInt(this.quantidade.value),
-      categoria: this.categoria.value.trim(),
-      tamanho: this.tamanho.value.trim() || '-',
-      data: new Date().toISOString()
-    };
-
-    adicionarOuSomarEPI(epi);
-    this.reset();
-  });
-
-  document.querySelector('#buscaNome').addEventListener('input', function () {
-    const filtro = this.value.toLowerCase().trim();
-    const linhas = document.querySelectorAll('#tabelaEstoque tbody tr');
-
-    // Função para escapar caracteres especiais da regex
-    const escapeRegex = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const palavras = filtro.split(/\s+/).map(escapeRegex);
-
-    linhas.forEach(linha => {
-      const nome = linha.cells[0].textContent.toLowerCase();
-      const categoria = linha.cells[2].textContent.toLowerCase();
-      const tamanho = linha.cells[3].textContent.toLowerCase();
-      const textoCombinado = `${nome} ${categoria} ${tamanho}`;
-
-      const corresponde = palavras.every(palavra => {
-        const regex = new RegExp(`\\b${palavra}\\b`, 'i');
-        return regex.test(textoCombinado);
-      });
-
-      linha.style.display = corresponde ? '' : 'none';
-    });
-  });
-
-  window.onload = () => {
-    carregarEstoque();
-  };
 </script>
 
 </body>
