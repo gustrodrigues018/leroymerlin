@@ -212,7 +212,7 @@
 
     await update(epiRef, { quantidade: novaQuantidade });
     
-    await registrarAcao(delta > 0 ? 'Adição' : 'Remoção', epi, delta);
+    await registrarAcao(delta > 0 ? 'Adição' : 'Remoção', { ...epi, quantidade: novaQuantidade }, delta);
 
     carregarEstoque();
   };
@@ -234,7 +234,7 @@
       await update(epiRef, { quantidade: novaQuantidade });
       await registrarAcao('Adição', { ...epi, quantidade: novaQuantidade }, parseInt(epi.quantidade));
     } else {
-      await set(epiRef, epi);
+      await set(epiRef, { ...epi, data: new Date().toISOString() });
       await registrarAcao('Cadastro', epi, parseInt(epi.quantidade));
     }
 
@@ -254,6 +254,25 @@
     carregarEstoque();
   };
 
+  // Aqui a mágica: capturar o submit do formulário e usar a função antiga
+  document.getElementById('formAdicionarEPI').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const novoEPI = {
+      nome: form.nome.value.trim(),
+      quantidade: parseInt(form.quantidade.value),
+      categoria: form.categoria.value.trim(),
+      tamanho: form.tamanho.value.trim() || '-',
+      data: new Date().toISOString()
+    };
+
+    await adicionarOuSomarEPI(novoEPI);
+
+    form.reset();
+  });
+
+  // Carregar o estoque na inicialização
   window.onload = carregarEstoque;
 </script>
 
