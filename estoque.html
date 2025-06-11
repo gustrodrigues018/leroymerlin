@@ -271,7 +271,25 @@
 
     form.reset();
   });
+  
+const inputBusca = document.getElementById('buscaNome');
 
+inputBusca.addEventListener('input', () => {
+  const filtro = inputBusca.value.toLowerCase();
+  const linhas = tabela.querySelectorAll('tr');
+
+  linhas.forEach(linha => {
+    const nome = linha.cells[0]?.textContent.toLowerCase() || '';
+    const categoria = linha.cells[2]?.textContent.toLowerCase() || '';
+    const tamanho = linha.cells[3]?.textContent.toLowerCase() || '';
+
+    if (nome.includes(filtro) || categoria.includes(filtro) || tamanho.includes(filtro)) {
+      linha.style.display = '';
+    } else {
+      linha.style.display = 'none';
+    }
+  });
+});
   // Carregar o estoque na inicialização
   window.onload = carregarEstoque;
 </script>
