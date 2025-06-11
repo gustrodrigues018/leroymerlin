@@ -7,16 +7,15 @@
 </head>
 <body>
   <nav id="menu-transparente">
-    <a href="Usuario.html">Usuario</a>
+    <a href="usuario.html">Usuário</a>
     <a href="relatorios.html">Relatorios</a>
-
   </nav>
   
   <h1>Estoque de EPIs</h1>
 
   <form id="formAdicionarEPI">
     <input type="text" name="nome" placeholder="Nome do EPI" required />
-    <input type="number" name="quantidade" placeholder="Quantidade" required />
+    <input type="number" name="quantidade" placeholder="Quantidade" required min="1" />
     <input type="text" name="categoria" placeholder="Categoria do EPI" required />
     <input type="text" name="tamanho" placeholder="Tamanho (opcional)" />
     <button type="submit">Adicionar EPI</button>
@@ -258,8 +257,5 @@
   window.onload = carregarEstoque;
 </script>
 
-
 </body>
 </html>
-
-
