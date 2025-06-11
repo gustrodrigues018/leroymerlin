@@ -242,9 +242,20 @@
 
   window.removerEpi = async function(id) {
     const epiRef = ref(db, `estoque/${id}`);
-    const snapshot = await get(epi
+    const snapshot = await get(epiRef);
+    const epi = snapshot.val();
 
+    if (!epi) return alert("EPI não encontrado.");
+
+    await remove(epiRef);
+    await registrarAcao('Exclusão', epi);
+
+    carregarEstoque();
+  };
+
+  window.onload = carregarEstoque;
 </script>
+
 
 </body>
 </html>
