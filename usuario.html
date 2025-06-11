@@ -155,6 +155,8 @@
 
   <div class="perfil">
     <img id="foto" class="foto" src="https://via.placeholder.com/100" alt="Foto de perfil">
+    <input type="file" id="inputFoto" accept="image/*" style="margin-top: 10px;" />
+
     <div class="info">
       <p><strong>Nome:</strong> <span id="nome">Carregando...</span></p>
       <p><strong>Email:</strong> <span id="email">Carregando...</span></p>
@@ -165,87 +167,78 @@
   <button onclick="sair()">Sair</button>
   <!-- Firebase SDKs -->
   <script type="module">
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
-      authDomain: "leroycontroll.firebaseapp.com",
-      projectId: "leroycontroll",
-      storageBucket: "leroycontroll.appspot.com",
-      messagingSenderId: "6215288603",
-      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be",
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+  authDomain: "leroycontroll.firebaseapp.com",
+  projectId: "leroycontroll",
+  storageBucket: "leroycontroll.appspot.com",
+  messagingSenderId: "6215288603",
+  appId: "1:6215288603:web:b8c8882a4a22a396a5f5be",
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-   inputFoto.addEventListener("change", async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    document.getElementById("email").textContent = user.email;
 
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Você precisa estar logado para alterar a foto.");
-    return;
-  }
-
-  try {
-    // Cria referência no Storage para foto do usuário (exemplo: usuarios/uid/perfil.jpg)
-    const fotoRef = ref(storage, `usuarios/${user.uid}/perfil.jpg`);
-
-    // Faz upload do arquivo
-    await uploadBytes(fotoRef, file);
-
-    // Pega URL pública da foto
-    const url = await getDownloadURL(fotoRef);
-
-    // Atualiza foto na interface
-    fotoElement.src = url;
-
-    // Atualiza a URL da foto no Firestore (documento do usuário)
     const docRef = doc(db, "usuarios", user.uid);
-    await setDoc(docRef, { fotoUrl: url }, { merge: true });
+    const docSnap = await getDoc(docRef);
 
-    alert("Foto atualizada com sucesso!");
+    if (docSnap.exists()) {
+      const dados = docSnap.data();
+      document.getElementById("nome").textContent = dados.nome || "Sem nome";
+      document.getElementById("nivel").textContent = dados.nivel || "comum";
+      if (dados.fotoUrl) {
+        document.getElementById("foto").src = dados.fotoUrl;
+      }
+    } else {
+      alert("Usuário não possui dados extras no Firestore.");
+    }
 
-  } catch (error) {
-    console.error("Erro ao enviar foto:", error);
-    alert("Erro ao enviar foto. Tente novamente.");
+    // FOTO DE PERFIL - SÓ FUNCIONA SE HOUVER <input type="file" id="inputFoto">
+    const inputFoto = document.getElementById("inputFoto");
+    const fotoElement = document.getElementById("foto");
+
+    if (inputFoto && fotoElement) {
+      inputFoto.addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        try {
+          const fotoRef = ref(storage, `usuarios/${user.uid}/perfil.jpg`);
+          await uploadBytes(fotoRef, file);
+          const url = await getDownloadURL(fotoRef);
+          fotoElement.src = url;
+
+          await setDoc(doc(db, "usuarios", user.uid), { fotoUrl: url }, { merge: true });
+
+          alert("Foto atualizada com sucesso!");
+        } catch (error) {
+          console.error("Erro ao enviar foto:", error);
+          alert("Erro ao enviar foto. Tente novamente.");
+        }
+      });
+    }
+
+  } else {
+    window.location.href = "index.html"; // redireciona se não estiver logado
   }
 });
 
+window.sair = async () => {
+  await signOut(auth);
+  window.location.href = "index.html";
+};
 
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        document.getElementById("email").textContent = user.email;
-
-        const docRef = doc(db, "usuarios", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const dados = docSnap.data();
-          document.getElementById("nome").textContent = dados.nome || "Sem nome";
-          document.getElementById("nivel").textContent = dados.nivel || "comum";
-          if (dados.fotoUrl) {
-            document.getElementById("foto").src = dados.fotoUrl;
-          }
-        } else {
-          alert("Usuário não possui dados extras no Firestore.");
-        }
-      } else {
-        window.location.href = "index.html"; // volta pro login
-      }
-    });
-
-    window.sair = async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
-    };
   </script>
 </body>
 </html>
