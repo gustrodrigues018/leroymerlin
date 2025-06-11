@@ -3,158 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <title>Painel do Usuário</title>
- <style>
-  :root {
-    --azul-escuro: #001F3F;
-    --azul-claro: #1976d2;
-    --branco: #ffffff;
-    --cinza-claro: #f4f6f8;
-    --sombra: rgba(0, 0, 0, 0.15);
-  }
+  <style>
+    :root {
+      --azul-escuro: #001F3F;
+      --azul-claro: #1976d2;
+      --branco: #ffffff;
+      --cinza-claro: #f4f6f8;
+      --sombra: rgba(0, 0, 0, 0.15);
+    }
 
-  * {
-    box-sizing: border-box;
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--azul-escuro); /* fundo azul escuro */
-    color: var(--branco); /* texto branco */
-    margin: 0;
-    padding: 30px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-
-  h1 {
-    font-size: 2.4rem;
-    margin-bottom: 30px;
-    color: var(--branco); /* título branco */
-    text-shadow: 0 0 5px var(--azul-claro);
-  }
-
-  .perfil {
-    background: #0a2a5b; /* azul mais claro para destacar */
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    max-width: 600px;
-    width: 100%;
-  }
-
-  .foto {
-    width: 120px;
-    height: 160px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--azul-claro);
-    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
-    flex-shrink: 0;
-    display: block; /* importante para o label funcionar direitinho */
-  }
-
-  /* AQUI: label clicável que envolve a foto */
-  .perfil label {
-    display: inline-block;
-    cursor: pointer;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
-  }
-
-  .info p {
-    font-size: 1.1rem;
-    margin: 8px 0;
-    color: var(--branco); /* texto branco dentro do perfil */
-  }
-
-  .info strong {
-    color: var(--azul-claro);
-  }
-
-  button {
-    margin-top: 30px;
-    padding: 12px 30px;
-    background: var(--azul-claro);
-    color: var(--branco);
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.6);
-  }
-
-  button:hover {
-    background: #005bb5;
-  }
-
-  @media (max-width: 480px) {
     body {
-      padding: 20px 10px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--azul-escuro);
+      color: var(--branco);
+      margin: 0;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 30px;
+      color: var(--branco);
+      text-shadow: 0 0 5px var(--azul-claro);
     }
 
     .perfil {
-      flex-direction: column;
-      padding: 20px;
-      gap: 20px;
-    }
-
-    .foto {
-      width: 100px;
-      height: 100px;
-      border-width: 2px;
+      background: #0a2a5b;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+      max-width: 600px;
+      width: 100%;
     }
 
     .info p {
-      font-size: 1rem;
+      font-size: 1.1rem;
+      margin: 8px 0;
+      color: var(--branco);
+    }
+
+    .info strong {
+      color: var(--azul-claro);
     }
 
     button {
-      width: 100%;
-      padding: 14px;
+      margin-top: 30px;
+      padding: 12px 30px;
+      background: var(--azul-claro);
+      color: var(--branco);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.6);
     }
-  }
 
-  #menu-transparente {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 8px 15px;
-    border-radius: 8px;
-    z-index: 1000;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease;
-  }
+    button:hover {
+      background: #005bb5;
+    }
 
-  #menu-transparente a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-  }
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 10px;
+      }
 
-  #menu-transparente a:hover {
-    color: #f1c40f;
-    text-decoration: underline;
-  }
+      .perfil {
+        padding: 20px;
+      }
 
-  #menu-transparente:hover {
-    background: rgba(0, 0, 0, 0.6);
-    cursor: pointer;
-  }
-</style>
+      .info p {
+        font-size: 1rem;
+      }
 
+      button {
+        width: 100%;
+        padding: 14px;
+      }
+    }
+
+    #menu-transparente {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px 15px;
+      border-radius: 8px;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s ease;
+    }
+
+    #menu-transparente a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    #menu-transparente a:hover {
+      color: #f1c40f;
+      text-decoration: underline;
+    }
+
+    #menu-transparente:hover {
+      background: rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
@@ -164,111 +132,62 @@
 
   <h1>👤 Perfil do Usuário</h1>
 
-<div class="perfil">
-  <div class="info">
-    <p><strong>Nome:</strong> <span id="nome">Carregando...</span></p>
-    <p><strong>Email:</strong> <span id="email">Carregando...</span></p>
-    <p><strong>Nível:</strong> <span id="nivel">Carregando...</span></p>
+  <div class="perfil">
+    <div class="info">
+      <p><strong>Nome:</strong> <span id="nome">Carregando...</span></p>
+      <p><strong>Email:</strong> <span id="email">Carregando...</span></p>
+      <p><strong>Nível:</strong> <span id="nivel">Carregando...</span></p>
+    </div>
   </div>
-</div>
 
-<button id="btnSair">Sair</button>
-  <!-- Firebase SDKs -->
-<script type="module">
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <button id="btnSair">Sair</button>
 
-// Configuração do Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
-  authDomain: "leroycontroll.firebaseapp.com",
-  projectId: "leroycontroll",
-  storageBucket: "leroycontroll.appspot.com",
-  messagingSenderId: "6215288603",
-  appId: "1:6215288603:web:b8c8882a4a22a396a5f5be",
-};
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Inicializa o app, auth, firestore e storage
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+      authDomain: "leroycontroll.firebaseapp.com",
+      projectId: "leroycontroll",
+      storageBucket: "leroycontroll.appspot.com",
+      messagingSenderId: "6215288603",
+      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be",
+    };
 
-// Escuta o estado de autenticação do usuário
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  document.getElementById("email").textContent = user.email;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
 
-  const docRef = doc(db, "usuarios", user.uid);
-  const docSnap = await getDoc(docRef);
+      document.getElementById("email").textContent = user.email;
 
-  if (docSnap.exists()) {
-    const dados = docSnap.data();
-    document.getElementById("nome").textContent = dados.nome || "Sem nome";
-    document.getElementById("nivel").textContent = dados.nivel || "comum";
-    if (dados.fotoUrl) {
-      document.getElementById("foto").src = dados.fotoUrl;
-    }
-  } else {
-    alert("Usuário não possui dados extras no Firestore.");
-  }
-});
+      const docRef = doc(db, "usuarios", user.uid);
+      const docSnap = await getDoc(docRef);
 
-// ===============================
-// UPLOAD DA FOTO DE PERFIL
-// ===============================
-const inputFoto = document.getElementById("inputFoto");
-const fotoElement = document.getElementById("foto");
+      if (docSnap.exists()) {
+        const dados = docSnap.data();
+        document.getElementById("nome").textContent = dados.nome || "Sem nome";
+        document.getElementById("nivel").textContent = dados.nivel || "comum";
+      } else {
+        alert("Usuário não possui dados extras no Firestore.");
+      }
+    });
 
-// Clique na imagem abre o seletor de arquivo
-fotoElement.addEventListener("click", () => {
-  inputFoto.click();
-});
-
-// Upload da nova foto selecionada
-inputFoto.addEventListener("change", async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Você precisa estar logado para alterar a foto.");
-    return;
-  }
-
-  try {
-    const fotoRef = ref(storage, `usuarios/${user.uid}/perfil.jpg`);
-    await uploadBytes(fotoRef, file);
-    const url = await getDownloadURL(fotoRef);
-    fotoElement.src = url;
-
-    const docRef = doc(db, "usuarios", user.uid);
-    await setDoc(docRef, { fotoUrl: url }, { merge: true });
-
-    alert("Foto atualizada com sucesso!");
-  } catch (error) {
-    console.error("Erro ao enviar foto:", error);
-    alert("Erro ao enviar foto. Tente novamente.");
-  }
-});
-
-// Logout
-document.getElementById('btnSair').addEventListener('click', async () => {
-  try {
-    await signOut(auth);
-    window.location.href = "index.html";
-  } catch (error) {
-    alert("Erro ao sair: " + error.message);
-  }
-});
-
-</script>
-
+    document.getElementById('btnSair').addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "index.html";
+      } catch (error) {
+        alert("Erro ao sair: " + error.message);
+      }
+    });
+  </script>
 </body>
 </html>
