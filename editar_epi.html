@@ -19,7 +19,7 @@
   <div style="margin-top: 20px; text-align: center;">
     <a href="index.html"><button type="button">Cancelar</button></a>
   </div>
-  <script type="module">
+ <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -49,11 +49,7 @@
   async function buscarEPI(id) {
     const epiRef = ref(db, `estoque/${id}`);
     const snapshot = await get(epiRef);
-    if (snapshot.exists()) {
-      return snapshot.val();
-    } else {
-      return null;
-    }
+    return snapshot.exists() ? snapshot.val() : null;
   }
 
   function preencherFormulario(dados) {
@@ -82,7 +78,10 @@
   }
 
   onAuthStateChanged(auth, async (user) => {
-    const userPermitido = "7PUWZ9lCu2UN4s8IOrsPgJU64wF3";
+    const usuariosPermitidos = [
+      "7PUWZ9lCu2UN4s8IOrsPgJU64wF3", // Gustavo
+      "eYH3ZXS9bshotZrzq9bAYd3ES1B3"  // Outro usuário
+    ];
 
     if (!user) {
       alert("Você precisa estar logado para editar um EPI.");
@@ -90,7 +89,7 @@
       return;
     }
 
-    if (user.uid !== userPermitido) {
+    if (!usuariosPermitidos.includes(user.uid)) {
       alert("Você não tem permissão para editar EPIs.");
       window.location.href = "index.html";
       return;
@@ -150,6 +149,7 @@
     });
   });
 </script>
+
 
 
 </body>
