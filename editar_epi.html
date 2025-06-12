@@ -22,8 +22,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
@@ -36,8 +36,8 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
     function getQueryParam(param) {
       return new URLSearchParams(window.location.search).get(param);
@@ -82,32 +82,24 @@
       });
     }
 
-    async function checarPermissao(uid) {
-      const permRef = ref(db, `permissoes/${uid}`);
-      const snapshot = await get(permRef);
-      if (!snapshot.exists()) return false;
-      const dados = snapshot.val();
-      return dados.editar_epi === true;
-    }
-
     onAuthStateChanged(auth, async (user) => {
+      const userPermitido = "7PUWZ9lCu2UN4s8IOrsPgJU64wF3";
+
       if (!user) {
         alert("Você precisa estar logado para editar um EPI.");
-        window.location.href = "login.html"; // ajuste pra sua página de login
+        window.location.href = "login.html"; // Ajuste para sua página de login
         return;
       }
 
-      const podeEditar = await checarPermissao(user.uid);
-      if (!podeEditar) {
+      if (user.uid !== userPermitido) {
         alert("Você não tem permissão para editar EPIs.");
         window.location.href = "index.html";
         return;
       }
 
-      // Se chegou aqui, está logado e pode editar: mostra o formulário
+      // Usuário autorizado, mostra formulário e carrega dados do EPI
       document.getElementById('formEditarEPI').style.display = 'block';
 
-      // Carrega os dados do EPI
       const id = getQueryParam('id');
       if (!id) {
         alert('ID do EPI não fornecido. Voltando...');
