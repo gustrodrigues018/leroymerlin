@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Relatórios de Ações</title>
 <style>
   :root {
@@ -34,12 +34,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   #buscaRelatorios {
     width: 80%;
-    max-width: 400px;
+    max-width: 300px;
     padding: 10px;
     font-size: 1rem;
     border-radius: 4px;
@@ -50,6 +52,22 @@
   }
 
   #buscaRelatorios:focus {
+    border-color: var(--azul-hover);
+    outline: none;
+  }
+
+  #filtroAcao {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--azul-claro);
+    background-color: var(--branco);
+    color: var(--azul-escuro);
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+
+  #filtroAcao:hover, #filtroAcao:focus {
     border-color: var(--azul-hover);
     outline: none;
   }
@@ -88,13 +106,20 @@
     color: var(--branco);
   }
 </style>
-
 </head>
 <body>
   <h1>Relatórios de Ações no Sistema</h1>
 
   <div class="centralizado">
     <input type="text" id="buscaRelatorios" placeholder="Filtrar relatórios..." />
+    <select id="filtroAcao" aria-label="Filtrar por ação">
+      <option value="">Todas as Ações</option>
+      <option value="Adição">Adição</option>
+      <option value="Exclusão">Exclusão</option>
+      <option value="Edição">Edição</option>
+      <option value="Retirada">Retirada</option>
+      <!-- pode adicionar mais ações se precisar -->
+    </select>
   </div>
 
   <table>
@@ -109,8 +134,7 @@
         <th>Data/Hora</th>
       </tr>
     </thead>
-    <tbody id="tabelaRelatorios">
-    </tbody>
+    <tbody id="tabelaRelatorios"></tbody>
   </table>
 
   <script type="module">
@@ -132,8 +156,9 @@
 
     const tbody = document.getElementById("tabelaRelatorios");
     const buscaInput = document.getElementById("buscaRelatorios");
+    const filtroAcao = document.getElementById("filtroAcao");
 
-    let relatoriosCache = []; // guarda os dados para o filtro local
+    let relatoriosCache = []; // cache geral
 
     async function carregarRelatorios() {
       const refRelatorios = ref(db, 'relatorios');
@@ -141,11 +166,40 @@
       const dados = snapshot.val();
 
       relatoriosCache = dados ? Object.values(dados).reverse() : [];
-      renderizarRelatorios(relatoriosCache);
+      aplicarFiltros();
+    }
+
+    function aplicarFiltros() {
+      const busca = buscaInput.value.toLowerCase();
+      const acaoFiltro = filtroAcao.value;
+
+      let filtrados = relatoriosCache.filter(acao => {
+        const casaBusca = (
+          (acao.usuario && acao.usuario.toLowerCase().includes(busca)) ||
+          (acao.tipoAcao && acao.tipoAcao.toLowerCase().includes(busca)) ||
+          (acao.nomeEPI && acao.nomeEPI.toLowerCase().includes(busca)) ||
+          (acao.categoria && acao.categoria.toLowerCase().includes(busca)) ||
+          (acao.tamanho && acao.tamanho.toLowerCase().includes(busca)) ||
+          (acao.alteracao !== undefined && String(acao.alteracao).includes(busca)) ||
+          (acao.dataHora && new Date(acao.dataHora).toLocaleString('pt-BR').toLowerCase().includes(busca))
+        );
+
+        // Se filtro por ação selecionado, verifica se bate com tipoAcao
+        const casaAcao = acaoFiltro ? acao.tipoAcao === acaoFiltro : true;
+
+        return casaBusca && casaAcao;
+      });
+
+      renderizarRelatorios(filtrados);
     }
 
     function renderizarRelatorios(dados) {
       tbody.innerHTML = '';
+      if(dados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">Nenhum relatório encontrado.</td></tr>`;
+        return;
+      }
+
       dados.forEach(acao => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -153,7 +207,7 @@
           <td>${acao.tipoAcao}</td>
           <td>${acao.nomeEPI}</td>
           <td>${acao.categoria}</td>
-          <td>${acao.tamanho}</td>
+          <td>${acao.tamanho || '-'}</td>
           <td>${acao.alteracao > 0 ? '+' : ''}${acao.alteracao}</td>
           <td>${new Date(acao.dataHora).toLocaleString('pt-BR')}</td>
         `;
@@ -161,25 +215,8 @@
       });
     }
 
-    buscaInput.addEventListener('input', () => {
-      const filtro = buscaInput.value.toLowerCase();
-      if (!filtro) {
-        renderizarRelatorios(relatoriosCache);
-        return;
-      }
-      const filtrados = relatoriosCache.filter(acao => {
-        return (
-          (acao.usuario && acao.usuario.toLowerCase().includes(filtro)) ||
-          (acao.tipoAcao && acao.tipoAcao.toLowerCase().includes(filtro)) ||
-          (acao.nomeEPI && acao.nomeEPI.toLowerCase().includes(filtro)) ||
-          (acao.categoria && acao.categoria.toLowerCase().includes(filtro)) ||
-          (acao.tamanho && acao.tamanho.toLowerCase().includes(filtro)) ||
-          (acao.alteracao && String(acao.alteracao).includes(filtro)) ||
-          (acao.dataHora && new Date(acao.dataHora).toLocaleString('pt-BR').toLowerCase().includes(filtro))
-        );
-      });
-      renderizarRelatorios(filtrados);
-    });
+    buscaInput.addEventListener('input', aplicarFiltros);
+    filtroAcao.addEventListener('change', aplicarFiltros);
 
     carregarRelatorios();
   </script>
