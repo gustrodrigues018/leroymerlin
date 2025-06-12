@@ -177,7 +177,7 @@
   </div>
 
   <!-- Firebase SDKs -->
- <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
     getAuth,
@@ -202,91 +202,96 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-   onAuthStateChanged(auth, (user) => {
-  if (user) {
-    window.location.href = "estoque.html"; // Redireciona direto
-  }
-});
   const db = getFirestore(app);
 
-  const status = document.getElementById("status");
-  const modal = document.getElementById("modalCadastro");
-  const btnCadastrar = document.getElementById("btnCadastrar");
-  const fecharModal = document.getElementById("fecharModal");
-  const statusCadastro = document.getElementById("statusCadastro");
-
-  // Abrir modal
-  btnCadastrar.onclick = () => {
-    statusCadastro.innerText = "";
-    modal.style.display = "flex";
-  };
-  fecharModal.onclick = () => modal.style.display = "none";
-  window.onclick = (e) => {
-    if (e.target === modal) modal.style.display = "none";
-  };
-
-  // Login
-  document.getElementById("formAuth").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
-
-    try {
-      await signInWithEmailAndPassword(auth, email, senha);
-      status.style.color = "lightgreen";
-      status.innerText = "✅ Logado com sucesso!";
-      window.location.href = "estoque.html";
-    } catch (error) {
-      status.style.color = "#ffdddd";
-      status.innerText = "❌ Erro no login: " + error.message;
-    }
-  });
-
-  // Cadastro + Firestore
-  document.getElementById("formCadastro").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    statusCadastro.style.color = "red";
-    statusCadastro.innerText = "";
-
-    const email = document.getElementById("emailCadastro").value;
-    const senha = document.getElementById("senhaCadastro").value;
-    const nome = document.getElementById("nomeCadastro").value;
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-      const user = userCredential.user;
-
-      // Adicionar dados extras no Firestore
-      await setDoc(doc(db, "usuarios", user.uid), {
-        nome: nome,
-        email: email,
-        nivel: "comum",
-        fotoUrl: "https://via.placeholder.com/100"
-      });
-
-      statusCadastro.style.color = "green";
-      statusCadastro.innerText = "Cadastro realizado com sucesso! Redirecionando...";
-
-      e.target.reset();
-      setTimeout(() => {
-        modal.style.display = "none";
+  window.addEventListener("DOMContentLoaded", () => {
+    // Redirecionar se já estiver logado
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
         window.location.href = "estoque.html";
-      }, 2000);
-    } catch (error) {
-      statusCadastro.innerText = "Erro: " + error.message;
-    }
-  });
+      }
+    });
 
-  // Monitorar login
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      status.style.color = "lightgreen";
-      status.innerText = `🔓 Logado como: ${user.email}`;
-    } else {
-      status.innerText = "";
-    }
+    const status = document.getElementById("status");
+    const modal = document.getElementById("modalCadastro");
+    const btnCadastrar = document.getElementById("btnCadastrar");
+    const fecharModal = document.getElementById("fecharModal");
+    const statusCadastro = document.getElementById("statusCadastro");
+
+    // Abrir modal
+    btnCadastrar.onclick = () => {
+      statusCadastro.innerText = "";
+      modal.style.display = "flex";
+    };
+    fecharModal.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    };
+
+    // Login
+    document.getElementById("formAuth").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+        status.style.color = "lightgreen";
+        status.innerText = "✅ Logado com sucesso!";
+        window.location.href = "estoque.html";
+      } catch (error) {
+        status.style.color = "#ffdddd";
+        status.innerText = "❌ Erro no login: " + error.message;
+      }
+    });
+
+    // Cadastro + Firestore
+    document.getElementById("formCadastro").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusCadastro.style.color = "red";
+      statusCadastro.innerText = "";
+
+      const email = document.getElementById("emailCadastro").value;
+      const senha = document.getElementById("senhaCadastro").value;
+      const nome = document.getElementById("nomeCadastro").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+        const user = userCredential.user;
+
+        // Adicionar dados extras no Firestore
+        await setDoc(doc(db, "usuarios", user.uid), {
+          nome: nome,
+          email: email,
+          nivel: "comum",
+          fotoUrl: "https://via.placeholder.com/100"
+        });
+
+        statusCadastro.style.color = "green";
+        statusCadastro.innerText = "Cadastro realizado com sucesso! Redirecionando...";
+
+        e.target.reset();
+        setTimeout(() => {
+          modal.style.display = "none";
+          window.location.href = "estoque.html";
+        }, 2000);
+      } catch (error) {
+        statusCadastro.innerText = "Erro: " + error.message;
+      }
+    });
+
+    // Atualizar status se o usuário estiver logado
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        status.style.color = "lightgreen";
+        status.innerText = `🔓 Logado como: ${user.email}`;
+      } else {
+        status.innerText = "";
+      }
+    });
   });
 </script>
+
 
 </body>
 </html>
