@@ -19,122 +19,126 @@
   <div style="margin-top: 20px; text-align: center;">
     <a href="index.html"><button type="button">Cancelar</button></a>
   </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+      authDomain: "leroycontroll.firebaseapp.com",
+      databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
+      projectId: "leroycontroll",
+      storageBucket: "leroycontroll.appspot.com",
+      messagingSenderId: "6215288603",
+      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
+    };
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
-    authDomain: "leroycontroll.firebaseapp.com",
-    databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
-    projectId: "leroycontroll",
-    storageBucket: "leroycontroll.appspot.com",
-    messagingSenderId: "6215288603",
-    appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
-  };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const auth = getAuth(app);
-
-  const form = document.getElementById('formEditarEPI');
-  const inputNome = document.getElementById('nome');
-  const inputQuantidade = document.getElementById('quantidade');
-  const inputCategoria = document.getElementById('categoria');
-  const inputTamanho = document.getElementById('tamanho');
-
-  let usuarioAtual = null;
-  let epiId = null;
-
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      usuarioAtual = user;
-      carregarEPI();
-    } else {
-      alert("Você precisa estar logado para editar.");
-      // opcional: redirecionar para login
-    }
-  });
-
-  async function carregarEPI() {
-    const urlParams = new URLSearchParams(window.location.search);
-    epiId = urlParams.get('id');
-
-    if (!epiId) {
-      alert("EPI não especificado.");
-      return;
+    function getQueryParam(param) {
+      return new URLSearchParams(window.location.search).get(param);
     }
 
-    const epiRef = ref(db, 'epis/' + epiId);
-    const snapshot = await get(epiRef);
-    const epi = snapshot.val();
-
-    if (!epi) {
-      alert("EPI não encontrado.");
-      return;
+    function gerarIdEPI(epi) {
+      return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
     }
 
-    inputNome.value = epi.nome || '';
-    inputQuantidade.value = epi.quantidade || 0;
-    inputCategoria.value = epi.categoria || '';
-    inputTamanho.value = epi.tamanho || '';
-
-    form.style.display = 'block';  // mostra o form só depois que carrega os dados
-  }
-
-  async function atualizarEPI(id, dados) {
-    const epiRef = ref(db, 'epis/' + id);
-    await set(epiRef, dados);
-  }
-
-  async function enviarRelatorio(dadosRelatorio) {
-    const relatoriosRef = ref(db, 'relatorios');
-    await push(relatoriosRef, dadosRelatorio);
-  }
-
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-
-    const nome = inputNome.value.trim();
-    const quantidade = Number(inputQuantidade.value);
-    const categoria = inputCategoria.value.trim();
-    const tamanho = inputTamanho.value.trim();
-
-    if (!nome || !categoria || isNaN(quantidade) || quantidade < 0) {
-      alert('Preencha todos os campos obrigatórios corretamente.');
-      return;
-    }
-
-    try {
-      const epiRef = ref(db, 'epis/' + epiId);
+    async function buscarEPI(id) {
+      const epiRef = ref(db, `estoque/${id}`);
       const snapshot = await get(epiRef);
-      const epiAntigo = snapshot.val() || {};
-      const quantidadeAntiga = Number(epiAntigo.quantidade) || 0;
-      const alteracao = quantidade - quantidadeAntiga;
-
-      await atualizarEPI(epiId, { nome, quantidade, categoria, tamanho });
-
-      await enviarRelatorio({
-        usuario: usuarioAtual.email || usuarioAtual.uid || 'Usuário desconhecido',
-        tipoAcao: 'Edição',
-        nomeEPI: nome,
-        categoria,
-        tamanho: tamanho || '-',
-        alteracao,
-        dataHora: new Date().toISOString()
-      });
-
-      alert('EPI atualizado com sucesso!');
-      // opcional: redirecionar para a lista ou outra página
-      // window.location.href = 'index.html';
-
-    } catch (erro) {
-      alert('Erro ao atualizar EPI: ' + erro.message);
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        return null;
+      }
     }
-  });
-</script>
+
+    function preencherFormulario(dados) {
+      document.getElementById('nome').value = dados.nome || '';
+      document.getElementById('quantidade').value = dados.quantidade || 0;
+      document.getElementById('categoria').value = dados.categoria || '';
+      document.getElementById('tamanho').value = dados.tamanho === '-' ? '' : dados.tamanho || '';
+    }
+
+    async function atualizarEPI(idAntigo, dados) {
+      const novoId = gerarIdEPI(dados);
+      const refAntigo = ref(db, `estoque/${idAntigo}`);
+      const refNovo = ref(db, `estoque/${novoId}`);
+
+      if (idAntigo !== novoId) {
+        await remove(refAntigo);
+      }
+
+      await set(refNovo, {
+        nome: dados.nome,
+        quantidade: Number(dados.quantidade),
+        categoria: dados.categoria,
+        tamanho: dados.tamanho || '-',
+        data: new Date().toISOString()
+      });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      const userPermitido = "7PUWZ9lCu2UN4s8IOrsPgJU64wF3";
+
+      if (!user) {
+        alert("Você precisa estar logado para editar um EPI.");
+        window.location.href = "login.html"; // Ajuste para sua página de login
+        return;
+      }
+
+      if (user.uid !== userPermitido) {
+        alert("Você não tem permissão para editar EPIs.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Usuário autorizado, mostra formulário e carrega dados do EPI
+      document.getElementById('formEditarEPI').style.display = 'block';
+
+      const id = getQueryParam('id');
+      if (!id) {
+        alert('ID do EPI não fornecido. Voltando...');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const epi = await buscarEPI(id);
+      if (!epi) {
+        alert('EPI não encontrado. Voltando...');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      preencherFormulario(epi);
+
+      const form = document.getElementById('formEditarEPI');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nome = form.nome.value.trim();
+        const quantidade = form.quantidade.value;
+        const categoria = form.categoria.value.trim();
+        const tamanho = form.tamanho.value.trim();
+
+        if (!nome || !categoria || quantidade === '' || isNaN(quantidade) || Number(quantidade) < 0) {
+          alert('Preencha todos os campos corretamente.');
+          return;
+        }
+
+        try {
+          await atualizarEPI(id, { nome, quantidade, categoria, tamanho });
+          alert('EPI atualizado com sucesso!');
+          window.location.href = 'index.html';
+        } catch (error) {
+          alert('Erro ao atualizar EPI: ' + error.message);
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
