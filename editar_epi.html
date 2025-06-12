@@ -20,125 +20,119 @@
     <a href="index.html"><button type="button">Cancelar</button></a>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
-      authDomain: "leroycontroll.firebaseapp.com",
-      databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
-      projectId: "leroycontroll",
-      storageBucket: "leroycontroll.appspot.com",
-      messagingSenderId: "6215288603",
-      appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDrLZd3S8UsVuqMqaE5WpZGlKuWb7E7pRU",
+    authDomain: "leroycontroll.firebaseapp.com",
+    databaseURL: "https://leroycontroll-default-rtdb.firebaseio.com",
+    projectId: "leroycontroll",
+    storageBucket: "leroycontroll.appspot.com",
+    messagingSenderId: "6215288603",
+    appId: "1:6215288603:web:b8c8882a4a22a396a5f5be"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
 
-    function getQueryParam(param) {
-      return new URLSearchParams(window.location.search).get(param);
+  let usuarioAtual = null;
+  let epiId = null; // pega da URL, por exemplo
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      usuarioAtual = user;
+      carregarEPI();
+    } else {
+      alert("Você precisa estar logado para editar.");
+      // redirecionar se quiser
+    }
+  });
+
+  // Função para carregar dados do EPI para o formulário (simplificado)
+  async function carregarEPI() {
+    const urlParams = new URLSearchParams(window.location.search);
+    epiId = urlParams.get('id');
+    if (!epiId) {
+      alert("EPI não especificado.");
+      return;
     }
 
-    function gerarIdEPI(epi) {
-      return `${epi.nome.toLowerCase()}-${epi.categoria.toLowerCase()}-${(epi.tamanho || '-').toLowerCase()}`;
+    const epiRef = ref(db, 'epis/' + epiId);
+    const snapshot = await get(epiRef);
+    const epi = snapshot.val();
+
+    if (!epi) {
+      alert("EPI não encontrado.");
+      return;
     }
 
-    async function buscarEPI(id) {
-      const epiRef = ref(db, `estoque/${id}`);
+    // Preenche o formulário (supondo ids iguais aos campos)
+    document.getElementById('nome').value = epi.nome;
+    document.getElementById('quantidade').value = epi.quantidade;
+    document.getElementById('categoria').value = epi.categoria;
+    document.getElementById('tamanho').value = epi.tamanho || '';
+  }
+
+  // Função para atualizar o EPI no banco
+  async function atualizarEPI(id, dados) {
+    const epiRef = ref(db, 'epis/' + id);
+    await set(epiRef, dados);
+  }
+
+  // Função para enviar relatório para o Firebase
+  async function enviarRelatorio(dadosRelatorio) {
+    const relatoriosRef = ref(db, 'relatorios');
+    await push(relatoriosRef, dadosRelatorio);
+  }
+
+  const form = document.getElementById('formEditarEPI');
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const nome = document.getElementById('nome').value.trim();
+    const quantidade = Number(document.getElementById('quantidade').value);
+    const categoria = document.getElementById('categoria').value.trim();
+    const tamanho = document.getElementById('tamanho').value.trim();
+
+    if (!nome || !categoria || isNaN(quantidade) || quantidade < 0) {
+      alert('Preencha todos os campos corretamente.');
+      return;
+    }
+
+    try {
+      // Pega o EPI antigo pra comparar quantidade
+      const epiRef = ref(db, 'epis/' + epiId);
       const snapshot = await get(epiRef);
-      if (snapshot.exists()) {
-        return snapshot.val();
-      } else {
-        return null;
-      }
-    }
+      const epiAntigo = snapshot.val() || {};
+      const quantidadeAntiga = Number(epiAntigo.quantidade) || 0;
+      const alteracao = quantidade - quantidadeAntiga;
 
-    function preencherFormulario(dados) {
-      document.getElementById('nome').value = dados.nome || '';
-      document.getElementById('quantidade').value = dados.quantidade || 0;
-      document.getElementById('categoria').value = dados.categoria || '';
-      document.getElementById('tamanho').value = dados.tamanho === '-' ? '' : dados.tamanho || '';
-    }
+      // Atualiza o EPI
+      await atualizarEPI(epiId, { nome, quantidade, categoria, tamanho });
 
-    async function atualizarEPI(idAntigo, dados) {
-      const novoId = gerarIdEPI(dados);
-      const refAntigo = ref(db, `estoque/${idAntigo}`);
-      const refNovo = ref(db, `estoque/${novoId}`);
-
-      if (idAntigo !== novoId) {
-        await remove(refAntigo);
-      }
-
-      await set(refNovo, {
-        nome: dados.nome,
-        quantidade: Number(dados.quantidade),
-        categoria: dados.categoria,
-        tamanho: dados.tamanho || '-',
-        data: new Date().toISOString()
+      // Envia relatório
+      await enviarRelatorio({
+        usuario: usuarioAtual.email || usuarioAtual.uid || 'Usuário desconhecido',
+        tipoAcao: 'Edição',
+        nomeEPI: nome,
+        categoria: categoria,
+        tamanho: tamanho || '-',
+        alteracao: alteracao,
+        dataHora: new Date().toISOString()
       });
+
+      alert('EPI atualizado com sucesso!');
+      window.location.href = 'index.html'; // ou onde quiser
+
+    } catch (erro) {
+      alert('Erro ao atualizar EPI: ' + erro.message);
     }
-
-    onAuthStateChanged(auth, async (user) => {
-      const userPermitido = "7PUWZ9lCu2UN4s8IOrsPgJU64wF3";
-
-      if (!user) {
-        alert("Você precisa estar logado para editar um EPI.");
-        window.location.href = "login.html"; // Ajuste para sua página de login
-        return;
-      }
-
-      if (user.uid !== userPermitido) {
-        alert("Você não tem permissão para editar EPIs.");
-        window.location.href = "index.html";
-        return;
-      }
-
-      // Usuário autorizado, mostra formulário e carrega dados do EPI
-      document.getElementById('formEditarEPI').style.display = 'block';
-
-      const id = getQueryParam('id');
-      if (!id) {
-        alert('ID do EPI não fornecido. Voltando...');
-        window.location.href = 'index.html';
-        return;
-      }
-
-      const epi = await buscarEPI(id);
-      if (!epi) {
-        alert('EPI não encontrado. Voltando...');
-        window.location.href = 'index.html';
-        return;
-      }
-
-      preencherFormulario(epi);
-
-      const form = document.getElementById('formEditarEPI');
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const nome = form.nome.value.trim();
-        const quantidade = form.quantidade.value;
-        const categoria = form.categoria.value.trim();
-        const tamanho = form.tamanho.value.trim();
-
-        if (!nome || !categoria || quantidade === '' || isNaN(quantidade) || Number(quantidade) < 0) {
-          alert('Preencha todos os campos corretamente.');
-          return;
-        }
-
-        try {
-          await atualizarEPI(id, { nome, quantidade, categoria, tamanho });
-          alert('EPI atualizado com sucesso!');
-          window.location.href = 'index.html';
-        } catch (error) {
-          alert('Erro ao atualizar EPI: ' + error.message);
-        }
-      });
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
