@@ -1,10 +1,13 @@
-  :root {
+:root {
   --azul-escuro: #001F3F;
   --azul-claro: #64b5f6;
   --azul-hover: #1565c0;
   --azul-extra-claro: #e3f2fd;
   --branco: #ffffff;
   --cinza-claro: #f5f5f5;
+  --cinza-texto: #2c3e50;
+  --vermelho: #e53935;
+  --vermelho-hover: #c62828;
   --sombra: rgba(0, 0, 0, 0.1);
 }
 
@@ -13,75 +16,84 @@ body {
   margin: 0;
   background-color: var(--azul-escuro);
   color: var(--branco);
-  text-transform: uppercase;
+  line-height: 1.6;
 }
 
 h1, h2 {
   text-align: center;
-  color: var(--branco);
-  margin-top: 20px;
+  margin: 30px 0 15px;
+  font-weight: 600;
 }
 
 form {
   background-color: var(--branco);
   color: var(--azul-escuro);
   border: 1px solid var(--azul-claro);
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
+  max-width: 640px;
+  margin: 30px auto;
+  padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 0 10px var(--sombra);
+  box-shadow: 0 8px 24px var(--sombra);
 }
 
 input[type="text"],
 input[type="number"] {
-  width: calc(33% - 12px);
-  padding: 10px;
-  margin: 5px;
+  width: calc(33% - 16px);
+  padding: 12px;
+  margin: 6px;
   border: 1px solid var(--azul-claro);
   border-radius: 8px;
   background-color: var(--branco);
-  color: var(--azul-escuro);
+  color: var(--cinza-texto);
+  transition: border 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: var(--azul-hover);
+  outline: none;
 }
 
 button {
-  background-color: var(--branco);
-  color: var(--azul-escuro);
-  padding: 10px 15px;
-  border: 2px solid var(--azul-claro);
-  margin: 5px;
+  background-color: var(--azul-claro);
+  color: var(--branco);
+  padding: 10px 18px;
+  border: none;
+  margin: 8px 5px 0;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  font-weight: bold;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px var(--sombra);
 }
 
 button:hover {
   background-color: var(--azul-hover);
-  color: var(--branco);
+  transform: translateY(-1px);
 }
 
 table {
   width: 90%;
-  margin: 0 auto 30px auto;
+  margin: 40px auto;
   border-collapse: collapse;
   background-color: var(--branco);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 0 15px var(--sombra);
+  box-shadow: 0 10px 25px var(--sombra);
 }
 
 th {
   background-color: var(--azul-claro);
-  color: var(--azul-escuro);
-  padding: 12px;
+  color: var(--branco);
+  padding: 16px;
+  font-weight: 600;
 }
 
 td {
-  padding: 12px;
+  padding: 14px;
   border-bottom: 1px solid #ddd;
   text-align: center;
-  color: var(--azul-escuro);
+  color: var(--cinza-texto);
 }
 
 tr:nth-child(even) {
@@ -91,31 +103,33 @@ tr:nth-child(even) {
 tr:hover {
   background-color: var(--azul-claro);
   color: var(--branco);
+  transition: background 0.3s ease;
 }
 
 /* Botão de deletar */
 td button {
-  background-color: #e53935;
+  background-color: var(--vermelho);
   border: none;
-  padding: 6px 10px;
+  padding: 6px 12px;
   color: white;
   border-radius: 5px;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 td button:hover {
-  background-color: #c62828;
+  background-color: var(--vermelho-hover);
 }
 
 /* Botão de editar */
 .btn-editar {
-  background-color: var(--branco);
-  color: var(--azul-escuro);
-  border: 2px solid var(--azul-claro);
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: transparent;
+  color: var(--azul-hover);
+  border: 2px solid var(--azul-hover);
+  padding: 6px 12px;
+  border-radius: 5px;
   font-weight: bold;
+  transition: all 0.3s ease;
 }
 
 .btn-editar:hover {
@@ -126,10 +140,8 @@ td button:hover {
 /* Modal */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background-color: rgba(0,0,0,0.5);
   display: none;
   align-items: center;
@@ -139,19 +151,19 @@ td button:hover {
 
 .modal-content {
   background-color: var(--branco);
-  padding: 16px;
-  border-radius: 8px;
-  width: 300px;
-  color: var(--azul-escuro);
-  box-shadow: 0 0 10px var(--sombra);
+  padding: 24px;
+  border-radius: 10px;
+  width: 340px;
+  color: var(--cinza-texto);
+  box-shadow: 0 0 15px var(--sombra);
 }
 
 .modal input {
   width: 100%;
-  margin: 6px 0;
-  padding: 8px;
+  margin: 8px 0;
+  padding: 10px;
   border: 1px solid var(--azul-claro);
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 /* Centralizado */
@@ -164,28 +176,25 @@ td button:hover {
 
 .centralizado input {
   width: 80%;
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   border: 1px solid var(--azul-claro);
   background-color: var(--branco);
-  color: var(--azul-escuro);
+  color: var(--cinza-texto);
 }
 
-
-
-
+/* Menu Transparente */
 #menu-transparente {
   position: fixed;
   top: 10px;
   right: 10px;
-  background: rgba(0, 0, 0, 0.3); /* transparente, mas escuro */
-  padding: 8px 15px;
-  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px 18px;
+  border-radius: 10px;
   z-index: 1000;
-  backdrop-filter: blur(6px); /* efeito blur atrás */
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 12px rgba(0,0,0,0.2);
   transition: background 0.3s ease;
 }
 
@@ -193,8 +202,8 @@ td button:hover {
   color: white;
   text-decoration: none;
   font-weight: bold;
-  font-family: Arial, sans-serif;
   font-size: 14px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 #menu-transparente a:hover {
